@@ -1,0 +1,123 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { Camera, Upload, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ConsentCheckbox } from "@/components/compliance/ConsentCheckbox";
+import { DisclaimerBanner } from "@/components/compliance/DisclaimerBanner";
+import { CameraCapture } from "@/components/scan/CameraCapture";
+import { useWizard, type MediaType } from "@/store/wizard-store";
+
+export function ConsentCaptureScreen() {
+  const imageConsent = useWizard((s) => s.imageConsent);
+  const setImageConsent = useWizard((s) => s.setImageConsent);
+  const setImage = useWizard((s) => s.setImage);
+  const beginScan = useWizard((s) => s.beginScan);
+
+  const [mode, setMode] = useState<"choose" | "camera">("choose");
+  const [error, setError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function handleCapture(base64: string, mediaType: MediaType) {
+    setImage(base64, mediaType);
+    beginScan();
+  }
+
+  function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result);
+      const base64 = result.split(",")[1] ?? "";
+      const mediaType = (
+        file.type === "image/png"
+          ? "image/png"
+          : file.type === "image/webp"
+            ? "image/webp"
+            : "image/jpeg"
+      ) as MediaType;
+      setImage(base64, mediaType);
+      beginScan();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-xl px-6 py-10">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-peach-deep">
+        Step 1 · Your photo
+      </p>
+      <h2 className="mt-3 font-serif text-[32px] leading-tight text-heading sm:text-[38px]">
+        A quick photo to begin
+      </h2>
+      <p className="mt-3 text-body">
+        Our AI gently maps your lower face to tailor your result. Your photo is
+        analysed once and then{" "}
+        <span className="font-semibold text-heading">deleted immediately</span>{" "}
+        — never stored.
+      </p>
+
+      {mode === "camera" ? (
+        <div className="mt-8">
+          <CameraCapture
+            onCapture={handleCapture}
+            onError={(m) => {
+              setError(m);
+              setMode("choose");
+            }}
+          />
+        </div>
+      ) : (
+        <div className="mt-8 space-y-5">
+          <ConsentCheckbox checked={imageConsent} onChange={setImageConsent}>
+            <span>
+              <Lock size={13} className="mr-1 inline text-sage-deep" />I consent
+              to my photo being analysed to personalise my result. I understand
+              it is processed once and not stored.
+            </span>
+          </ConsentCheckbox>
+
+          {error && (
+            <p className="rounded-xl bg-peach-light/40 px-4 py-3 text-sm text-heading">
+              {error}
+            </p>
+          )}
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button
+              size="lg"
+              className="flex-1"
+              disabled={!imageConsent}
+              onClick={() => setMode("camera")}
+            >
+              <Camera size={18} /> Use camera
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="flex-1"
+              disabled={!imageConsent}
+              onClick={() => fileRef.current?.click()}
+            >
+              <Upload size={18} /> Upload photo
+            </Button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={handleUpload}
+            />
+          </div>
+
+          <DisclaimerBanner className="mt-2" />
+        </div>
+      )}
+    </div>
+  );
+}

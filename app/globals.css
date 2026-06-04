@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/* ───────────────────────────────────────────────────────────────────────────
+   MEDfacials brand tokens (exact, from the live clinic site).
+   Warm-premium, doctor-led: peach + cream + sage, Castoro serif / Mulish sans.
+   ─────────────────────────────────────────────────────────────────────────── */
+@theme {
+  --color-peach: #efac88;
+  --color-peach-light: #fdd9b5;
+  --color-peach-deep: #e3946b;
+  --color-cream: #fff8ee;
+  --color-cream-deep: #f6ead8;
+  --color-sage: #90aaa9;
+  --color-sage-deep: #6f8d8c;
+  --color-heading: #485656;
+  --color-body: #757575;
+  --color-ink: #141414;
+
+  --font-serif: var(--font-castoro), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-mulish), Helvetica, Arial, sans-serif;
+
+  --radius-xl2: 1.75rem;
+
+  --shadow-soft: 0 18px 50px -24px rgba(72, 86, 86, 0.35);
+  --shadow-glow: 0 0 60px -10px rgba(239, 172, 136, 0.55);
+
+  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-body);
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  color: var(--color-heading);
+  letter-spacing: -0.01em;
+}
+
+/* Subtle vignette helper used by cinematic sections */
+.bg-grain {
+  background-image: radial-gradient(
+    120% 120% at 50% 0%,
+    rgba(255, 248, 238, 0) 40%,
+    rgba(111, 141, 140, 0.08) 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
