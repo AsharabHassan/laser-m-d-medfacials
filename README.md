@@ -46,7 +46,7 @@ npm run build   # production build + type-check
 ```
 
 ## Deploy (Vercel)
-1. Push to a Git repo and import into Vercel (root: `endolift-app`).
+1. Push to a Git repo and import into Vercel. The Next.js app is at the **repository root**, so leave **Root Directory** empty (`./`) — do **not** set it to a subfolder, or Vercel will 404. Framework Preset should auto-detect as **Next.js**.
 2. Set the env vars above in the Vercel project.
 3. Point `endolift.medfacials.com` at the deployment.
 

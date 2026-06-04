@@ -7,9 +7,22 @@ import { EASE } from "@/lib/motion";
 
 // Real, consented MEDfacials Endolift before/after pairs. Faces are cropped to
 // the treatment area only. Replace or extend this list as new cases are approved.
+// Both sliders share one frame size for a balanced grid; each photo is shown
+// fully (object-contain) inside that frame, letterboxed where its native ratio
+// differs from the frame.
+const FRAME_RATIO = "4 / 3";
+
 const CASES = [
-  { area: "jawline and neck", before: "/results/neck-before.jpg", after: "/results/neck-after.jpg" },
-  { area: "under-eye", before: "/results/eyes-before.jpg", after: "/results/eyes-after.jpg" },
+  {
+    area: "jawline and neck",
+    before: "/results/neck-before.jpg",
+    after: "/results/neck-after.jpg",
+  },
+  {
+    area: "under-eye",
+    before: "/results/eyes-before.jpg",
+    after: "/results/eyes-after.jpg",
+  },
 ] as const;
 
 export function ResultsGallery() {
@@ -32,7 +45,12 @@ export function ResultsGallery() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12 * i, duration: 0.5, ease: EASE }}
           >
-            <BeforeAfterSlider beforeSrc={c.before} afterSrc={c.after} area={c.area} />
+            <BeforeAfterSlider
+              beforeSrc={c.before}
+              afterSrc={c.after}
+              area={c.area}
+              ratio={FRAME_RATIO}
+            />
           </motion.div>
         ))}
       </div>

@@ -14,6 +14,8 @@ interface BeforeAfterSliderProps {
   afterSrc: string;
   /** Accessible description of what the pair shows, e.g. "jawline and neck". */
   area: string;
+  /** CSS aspect-ratio of the frame, matched to the source images (e.g. "1 / 1"). */
+  ratio?: string;
   className?: string;
 }
 
@@ -21,6 +23,7 @@ export function BeforeAfterSlider({
   beforeSrc,
   afterSrc,
   area,
+  ratio = "4 / 3",
   className,
 }: BeforeAfterSliderProps) {
   const [pos, setPos] = useState(50); // reveal position, 0–100 (% from left)
@@ -62,7 +65,8 @@ export function BeforeAfterSlider({
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
-        className="relative aspect-[4/3] w-full cursor-ew-resize select-none overflow-hidden rounded-2xl border border-sage/20 bg-cream-deep shadow-soft"
+        style={{ aspectRatio: ratio }}
+        className="relative w-full cursor-ew-resize select-none overflow-hidden rounded-2xl border border-sage/20 bg-cream-deep shadow-soft"
       >
         {/* AFTER — base layer (full width) */}
         <img
@@ -70,7 +74,7 @@ export function BeforeAfterSlider({
           alt={`${area} after Endolift at MEDfacials`}
           draggable={false}
           loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-contain"
         />
 
         {/* BEFORE — clipped to the left of the handle */}
@@ -83,7 +87,7 @@ export function BeforeAfterSlider({
             alt={`${area} before Endolift at MEDfacials`}
             draggable={false}
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-contain"
           />
         </div>
 
