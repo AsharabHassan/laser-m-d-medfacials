@@ -56,19 +56,36 @@ describe("wizard-store transitions", () => {
 });
 
 describe("wizard-store result gating", () => {
-  it("reveal() is blocked until a lead is captured", () => {
-    s().reveal(result);
+  it("reveal() is blocked until a lead is captured, even once the result exists", () => {
+    s().setResult(result); // computed during the scan, before the lead gate
+    s().reveal();
     expect(s().step).not.toBe("result");
-    expect(s().result).toBeNull();
   });
 
-  it("reveal() unlocks the result once a lead exists, and clears the image", () => {
-    s().setImage("b64", "image/jpeg");
+  it("reveal() is blocked until the result exists, even once a lead is captured", () => {
     s().setLead(lead);
-    s().reveal(result);
+    s().reveal();
+    expect(s().step).not.toBe("result");
+  });
+
+  it("reveal() unlocks the result once both lead and result exist, retaining the image for the report", () => {
+    s().setImage("b64", "image/jpeg");
+    s().setResult(result);
+    s().setLead(lead);
+    s().reveal();
     expect(s().step).toBe("result");
     expect(s().result).toEqual(result);
-    expect(s().imageBase64).toBeNull(); // privacy: image dropped after analysis
+    // The selfie is kept in memory so the result screen can crop the user's
+    // treatment areas; reset() (tested below) drops it.
+    expect(s().imageBase64).toBe("b64");
+  });
+
+  it("reset() drops the retained selfie and landmarks", () => {
+    s().setImage("b64", "image/jpeg");
+    s().setLandmarks([{ x: 0.5, y: 0.5, z: 0 }]);
+    s().reset();
+    expect(s().imageBase64).toBeNull();
+    expect(s().landmarks).toBeNull();
   });
 });
 

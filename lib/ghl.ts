@@ -25,12 +25,16 @@ export interface GhlPayload {
   headline: string;
   marketingConsent: boolean;
   submittedAt?: string;
+  metaEventId?: string;
+  metaPixelId?: string;
 }
 
 export function buildGhlPayload(
   lead: Lead,
   result: AnalyzeResult,
   submittedAt?: string,
+  metaEventId?: string,
+  metaPixelId?: string,
 ): GhlPayload {
   return {
     firstName: lead.firstName,
@@ -50,5 +54,7 @@ export function buildGhlPayload(
     headline: result.narrative.headline,
     marketingConsent: lead.marketingConsent,
     submittedAt,
+    metaEventId,
+    metaPixelId,
   };
 }

@@ -40,7 +40,9 @@ export function BeforeAfterSlider({
 
   const onPointerDown = (e: React.PointerEvent) => {
     dragging.current = true;
-    (e.target as Element).setPointerCapture?.(e.pointerId);
+    // Capture on the frame (not e.target, which may be a child img/handle) so
+    // move events keep flowing even if the finger/cursor leaves the element.
+    frameRef.current?.setPointerCapture?.(e.pointerId);
     setFromClientX(e.clientX);
   };
   const onPointerMove = (e: React.PointerEvent) => {
@@ -66,7 +68,7 @@ export function BeforeAfterSlider({
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         style={{ aspectRatio: ratio }}
-        className="relative w-full cursor-ew-resize select-none overflow-hidden rounded-2xl border border-sage/20 bg-cream-deep shadow-soft"
+        className="relative w-full cursor-ew-resize touch-none select-none overflow-hidden rounded-2xl border border-sage/20 bg-cream-deep shadow-soft"
       >
         {/* AFTER — base layer (full width) */}
         <img

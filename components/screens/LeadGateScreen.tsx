@@ -8,6 +8,7 @@ import { TextField } from "@/components/ui/text-field";
 import { ConsentCheckbox } from "@/components/compliance/ConsentCheckbox";
 import { useWizard } from "@/store/wizard-store";
 import { requestAnalysis, submitLead } from "@/lib/api-client";
+import { META_PIXEL_ID } from "@/lib/constants";
 import type { Lead } from "@/lib/types";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,7 +17,9 @@ export function LeadGateScreen() {
   const imageBase64 = useWizard((s) => s.imageBase64);
   const imageMediaType = useWizard((s) => s.imageMediaType);
   const imageConsent = useWizard((s) => s.imageConsent);
+  const storedResult = useWizard((s) => s.result);
   const setLead = useWizard((s) => s.setLead);
+  const setResult = useWizard((s) => s.setResult);
   const reveal = useWizard((s) => s.reveal);
 
   const [firstName, setFirstName] = useState("");
@@ -53,13 +56,30 @@ export function LeadGateScreen() {
     };
     setLead(lead);
 
-    const result = await requestAnalysis({
-      imageBase64,
-      imageMediaType,
-      imageConsent,
-    });
-    await submitLead({ lead, result });
-    reveal(result);
+    // The analysis already ran behind the scan loader; just reveal it. The inline
+    // requestAnalysis is a defensive fallback for the rare case the result isn't
+    // ready yet (e.g. a very slow first request), so the user is never stuck.
+    let result = storedResult;
+    if (!result) {
+      result = await requestAnalysis({
+        imageBase64,
+        imageMediaType,
+        imageConsent,
+      });
+      setResult(result);
+    }
+
+    const eventId = crypto.randomUUID();
+
+    // Fire browser Pixel Lead event — the eventID links to the server-side CAPI event
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (typeof window !== "undefined" && typeof (window as any).fbq === "function") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).fbq("track", "Lead", {}, { eventID: eventId });
+    }
+
+    await submitLead({ lead, result, eventId, metaPixelId: META_PIXEL_ID });
+    reveal();
   }
 
   return (

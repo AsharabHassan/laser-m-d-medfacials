@@ -72,6 +72,9 @@ export async function assessPhoto(params: {
   if (!block || block.type !== "text") throw new Error("no text block");
   const raw = JSON.parse(block.text) as {
     suitability: string;
+    laxityFit: number;
+    skinQuality: number;
+    areaFit: number;
     headline: string;
     narrative: string;
     observedAreas: string[];
@@ -89,8 +92,18 @@ export async function assessPhoto(params: {
     throw new Error("malformed assessment");
   }
 
+  // The score is the sum of Claude's three observed factors (0–100). Summing
+  // independently-judged parts gives a genuine, face-specific number that varies
+  // photo-to-photo, instead of anchoring to a band midpoint. Missing/invalid
+  // factors → NaN, and buildResult falls back to the bucket midpoint.
+  const factors = [raw.laxityFit, raw.skinQuality, raw.areaFit];
+  const score = factors.every((n) => typeof n === "number" && Number.isFinite(n))
+    ? factors.reduce((a, b) => a + b, 0)
+    : NaN;
+
   return {
     suitability: bucket,
+    score,
     narrative: {
       headline: raw.headline,
       narrative: raw.narrative,

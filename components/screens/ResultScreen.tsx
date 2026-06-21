@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { Sparkles } from "lucide-react";
 import { useWizard } from "@/store/wizard-store";
 import { SuitabilityGauge } from "@/components/result/SuitabilityGauge";
+import { AreaFocus } from "@/components/result/AreaFocus";
 import { WhatToExpect } from "@/components/result/WhatToExpect";
 import { ResultsGallery } from "@/components/result/ResultsGallery";
 import { Testimonials } from "@/components/result/Testimonials";
@@ -70,6 +71,10 @@ export function ResultScreen() {
         <p className="mt-5 border-t border-sage/15 pt-4 text-[15px] font-medium leading-relaxed text-heading">
           {narrative.encouragement}
         </p>
+      </motion.div>
+
+      <motion.div {...reveal(0.6)} className="mt-10">
+        <AreaFocus />
       </motion.div>
 
       <motion.div {...reveal(0.7)} className="mt-8">

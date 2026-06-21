@@ -58,7 +58,7 @@ export const BUCKET_META: Record<Bucket, BucketMeta> = {
       "Your answers point to exactly the kind of early-to-moderate firmness Endolift addresses beautifully.",
     accent: "peach",
     ctaLabel: "Book your free consultation",
-    gaugeBand: [80, 100],
+    gaugeBand: [82, 100],
   },
   good: {
     label: "Good candidate",
@@ -67,7 +67,7 @@ export const BUCKET_META: Record<Bucket, BucketMeta> = {
       "You show many of the signs that respond well to Endolift — a consultation will confirm the detail.",
     accent: "peach",
     ctaLabel: "Book your free consultation",
-    gaugeBand: [60, 80],
+    gaugeBand: [68, 88],
   },
   consultation: {
     label: "Consultation recommended",
@@ -76,7 +76,7 @@ export const BUCKET_META: Record<Bucket, BucketMeta> = {
       "A few of your answers are best reviewed by Dr Stolte's team before we can be sure. That's completely normal.",
     accent: "sage",
     ctaLabel: "Book your free consultation",
-    gaugeBand: [40, 65],
+    gaugeBand: [55, 75],
   },
   alternative: {
     label: "Let's explore your options",
@@ -85,7 +85,7 @@ export const BUCKET_META: Record<Bucket, BucketMeta> = {
       "Your goals may be better met by a different approach. A free consultation is the best way to find the right one.",
     accent: "sage",
     ctaLabel: "Discuss your options",
-    gaugeBand: [25, 50],
+    gaugeBand: [40, 60],
   },
 };
 
@@ -115,3 +115,5 @@ export const PRICE_GUIDE = {
 
 export const DISCLAIMER =
   "This tool offers general information to help you prepare for a consultation. It is not a medical assessment or diagnosis. Suitability for Endolift is confirmed in person by a qualified practitioner.";
+
+export const META_PIXEL_ID = "1309943261329384";

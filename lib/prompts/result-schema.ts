@@ -10,7 +10,22 @@ export const RESULT_SCHEMA = {
       type: "string",
       enum: ["strong", "good", "consultation", "alternative"],
       description:
-        "The cosmetic suitability outcome. 'strong' = clearly mild laxity, ideal; 'good' = mild-to-moderate; 'consultation' = unclear photo or more pronounced laxity needing in-person review; 'alternative' = clearly heavy/loose skin better suited to another approach. When unsure, choose 'consultation'.",
+        "The cosmetic suitability outcome. 'strong' = a clear, treatable lower-face concern in an Endolift target area (jawline softening, jowls, under-chin fullness, neck laxity) — the ideal candidate; 'good' = milder/subtler softening; 'consultation' = the photo can't be assessed or the case is genuinely borderline; 'alternative' = clearly excessive/heavy skin realistically needing surgery.",
+    },
+    laxityFit: {
+      type: "number",
+      description:
+        "0–40. How CLEARLY a treatable lower-face concern is present (visible jawline softening, jowls, under-chin fullness, neck laxity). A clear, treatable concern scores HIGH — this is exactly who Endolift helps. Score low only when there is no visible concern at all, or the laxity is so excessive it realistically needs surgery. Judge ONLY from this photo, with fine gradations — avoid identical values across different faces.",
+    },
+    skinQuality: {
+      type: "number",
+      description:
+        "0–30. Apparent skin health and resilience for an energy-based tightening treatment (healthy, even skin scores higher). Judge only from this photo, with fine gradations.",
+    },
+    areaFit: {
+      type: "number",
+      description:
+        "0–30. How well the standout concern sits in an Endolift target area (jawline, jowls, under-chin, neck, mid-face). A concern squarely in these areas scores high. Judge only from this photo, with fine gradations.",
     },
     headline: {
       type: "string",
@@ -33,5 +48,14 @@ export const RESULT_SCHEMA = {
         "One reassuring sentence inviting a free consultation, noting that final suitability and safety are confirmed in person.",
     },
   },
-  required: ["suitability", "headline", "narrative", "observedAreas", "encouragement"],
+  required: [
+    "suitability",
+    "laxityFit",
+    "skinQuality",
+    "areaFit",
+    "headline",
+    "narrative",
+    "observedAreas",
+    "encouragement",
+  ],
 } as const;

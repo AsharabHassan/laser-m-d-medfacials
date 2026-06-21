@@ -15,6 +15,8 @@ interface CameraCaptureProps {
 export function CameraCapture({ onCapture, onError }: CameraCaptureProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export function CameraCapture({ onCapture, onError }: CameraCaptureProps) {
           setReady(true);
         }
       } catch {
-        onError(
+        onErrorRef.current(
           "We couldn't access your camera. You can upload a photo instead, or just answer the questions.",
         );
       }
@@ -46,7 +48,8 @@ export function CameraCapture({ onCapture, onError }: CameraCaptureProps) {
       cancelled = true;
       streamRef.current?.getTracks().forEach((t) => t.stop());
     };
-  }, [onError]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function capture() {
     const video = videoRef.current;

@@ -8,6 +8,7 @@ import {
   type NormalizedPoint,
 } from "@/components/scan/useFaceLandmarker";
 import { FaceMeshOverlay } from "@/components/scan/FaceMeshOverlay";
+import { requestAnalysis } from "@/lib/api-client";
 
 const STATUS = [
   "Mapping facial structure",
@@ -19,6 +20,10 @@ const STATUS = [
 export function ScanScreen() {
   const imageBase64 = useWizard((s) => s.imageBase64);
   const imageMediaType = useWizard((s) => s.imageMediaType);
+  const imageConsent = useWizard((s) => s.imageConsent);
+  const result = useWizard((s) => s.result);
+  const setResult = useWizard((s) => s.setResult);
+  const setLandmarksStore = useWizard((s) => s.setLandmarks);
   const completeScan = useWizard((s) => s.completeScan);
   const reduce = useReducedMotion();
 
@@ -28,30 +33,60 @@ export function ScanScreen() {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [statusIndex, setStatusIndex] = useState(0);
 
+  // The scan runs the REAL analysis behind the loader. We advance to the lead gate
+  // only when BOTH the analysis has resolved (store.result is set) and a minimum
+  // animation time has elapsed, so the loader always reflects genuine work without
+  // ever feeling abrupt.
+  const [minElapsed, setMinElapsed] = useState(false);
+  const startedRef = useRef(false);
+
   const dataUrl = imageBase64
     ? `data:${imageMediaType};base64,${imageBase64}`
     : null;
 
-  // Detect once the still and the model are both ready.
+  // Detect once the still and the model are both ready (drives the mesh overlay,
+  // and is kept in the store so the result screen can crop the user's areas).
   useEffect(() => {
     if (ready && imgLoaded && imgRef.current && !landmarks) {
-      setLandmarks(detect(imgRef.current));
+      const pts = detect(imgRef.current);
+      setLandmarks(pts);
+      setLandmarksStore(pts);
     }
-  }, [ready, imgLoaded, detect, landmarks]);
+  }, [ready, imgLoaded, detect, landmarks, setLandmarksStore]);
 
-  // Cycle status lines and finish.
+  // Kick off the real Claude analysis once and write the outcome straight to the
+  // store. We deliberately do NOT gate the store write on an effect-scoped flag:
+  // under React's dev Strict Mode the effect mounts→unmounts→remounts, and a
+  // cancel-on-cleanup flag would orphan the in-flight request and leave the scan
+  // spinning forever. The store is the single source of truth and survives the
+  // remount. requestAnalysis never throws (it degrades to a safe fallback).
+  useEffect(() => {
+    if (startedRef.current || result) return;
+    startedRef.current = true;
+    requestAnalysis({ imageBase64, imageMediaType, imageConsent }).then(
+      setResult,
+    );
+  }, [imageBase64, imageMediaType, imageConsent, setResult, result]);
+
+  // Cycle status lines and mark the minimum animation time as elapsed.
   useEffect(() => {
     const total = reduce ? 1600 : 4200;
     const per = total / STATUS.length;
     const timers = STATUS.map((_, i) =>
       setTimeout(() => setStatusIndex(i), per * i),
     );
-    const done = setTimeout(() => completeScan(), total);
+    const done = setTimeout(() => setMinElapsed(true), total);
     return () => {
       timers.forEach(clearTimeout);
       clearTimeout(done);
     };
-  }, [completeScan, reduce]);
+  }, [reduce]);
+
+  // Advance to the lead gate only once the analysis result is in the store AND the
+  // loader has run its minimum duration. If the API is slow, the loader holds.
+  useEffect(() => {
+    if (result && minElapsed) completeScan();
+  }, [result, minElapsed, completeScan]);
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center px-6 py-10">

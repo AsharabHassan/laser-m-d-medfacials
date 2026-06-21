@@ -5,17 +5,27 @@ import type { AnalyzeResult, Bucket, PhotoAssessment } from "./types";
 // generic fallback (always "consultation") for when the vision call fails.
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Per-bucket display bands. Claude's raw score is clamped into the band for the
+// outcome it chose, so the number varies photo-to-photo while staying coherent
+// with the verdict (and within each bucket's gauge band in lib/constants.ts).
+const BANDS: Record<Bucket, [number, number]> = {
+  great: [80, 99],
+  good: [62, 86],
+  consultation: [50, 74],
+  alternative: [38, 62],
+};
+
+/** Clamp Claude's 0–100 score into the chosen bucket's band. */
+export function scoreInBucket(bucket: Bucket, score: number): number {
+  const [lo, hi] = BANDS[bucket];
+  if (!Number.isFinite(score)) return Math.round((lo + hi) / 2);
+  return Math.max(lo, Math.min(hi, Math.round(score)));
+}
+
+/** Band midpoint — used when there's no Claude score (no-photo / error fallback). */
 export function scoreForBucket(bucket: Bucket): number {
-  switch (bucket) {
-    case "great":
-      return 90;
-    case "good":
-      return 72;
-    case "consultation":
-      return 54;
-    case "alternative":
-      return 44;
-  }
+  const [lo, hi] = BANDS[bucket];
+  return Math.round((lo + hi) / 2);
 }
 
 export function buildResult(
@@ -24,7 +34,7 @@ export function buildResult(
 ): AnalyzeResult {
   return {
     bucket: assessment.suitability,
-    score: scoreForBucket(assessment.suitability),
+    score: scoreInBucket(assessment.suitability, assessment.score),
     hardFlags: [],
     softFlagged: false,
     routedReason: "",

@@ -102,6 +102,8 @@ export interface AnalyzeRequest {
 export interface PhotoAssessment {
   /** The suitability outcome Claude chose, mapped to a Bucket server-side. */
   suitability: Bucket;
+  /** Claude's 0–100 suitability score for this face; clamped to the bucket band. */
+  score: number;
   narrative: ClaudeNarrative;
 }
 
@@ -109,4 +111,7 @@ export interface PhotoAssessment {
 export interface LeadRequest {
   lead: Lead;
   result: AnalyzeResult;
+  /** Shared event ID for Meta browser Pixel ↔ Conversions API deduplication. */
+  eventId?: string;
+  metaPixelId?: string;
 }

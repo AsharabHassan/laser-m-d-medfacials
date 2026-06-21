@@ -1,10 +1,13 @@
 import { create } from "zustand";
 import type { AnalyzeResult, Lead } from "@/lib/types";
+import type { NormalizedPoint } from "@/components/scan/useFaceLandmarker";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // The wizard is a small, explicit state machine: hero → consent → scan → lead →
-// result. The result cannot be revealed until a lead is captured, and the selfie
-// is dropped from memory the moment it's no longer needed (privacy).
+// result. The result cannot be revealed until a lead is captured. The selfie and
+// its on-device face landmarks are kept in memory (never persisted, never sent to
+// a server beyond the stateless /api/analyze call) so the result screen can show
+// the user their own cropped treatment areas; reset() drops everything.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type Step = "hero" | "consent" | "scan" | "lead" | "result";
@@ -16,6 +19,7 @@ interface WizardState {
   imageConsent: boolean;
   imageBase64: string | null;
   imageMediaType: MediaType;
+  landmarks: NormalizedPoint[] | null;
   lead: Lead | null;
   result: AnalyzeResult | null;
   error: string | null;
@@ -24,11 +28,13 @@ interface WizardState {
   start: () => void;
   setImageConsent: (v: boolean) => void;
   setImage: (base64: string, mediaType: MediaType) => void;
+  setLandmarks: (pts: NormalizedPoint[] | null) => void;
   beginScan: () => void;
   completeScan: () => void;
   goToLead: () => void;
   setLead: (lead: Lead) => void;
-  reveal: (result: AnalyzeResult) => void;
+  setResult: (result: AnalyzeResult) => void;
+  reveal: () => void;
   clearImage: () => void;
   setError: (msg: string | null) => void;
   goToStep: (step: Step) => void;
@@ -40,6 +46,7 @@ const initial = {
   imageConsent: false,
   imageBase64: null as string | null,
   imageMediaType: "image/jpeg" as MediaType,
+  landmarks: null as NormalizedPoint[] | null,
   lead: null as Lead | null,
   result: null as AnalyzeResult | null,
   error: null as string | null,
@@ -55,6 +62,8 @@ export const useWizard = create<WizardState>((set, get) => ({
   setImage: (base64, mediaType) =>
     set({ imageBase64: base64, imageMediaType: mediaType }),
 
+  setLandmarks: (landmarks) => set({ landmarks }),
+
   beginScan: () => {
     const { imageConsent, imageBase64 } = get();
     if (!imageConsent || !imageBase64) return; // blocked
@@ -67,9 +76,16 @@ export const useWizard = create<WizardState>((set, get) => ({
 
   setLead: (lead) => set({ lead }),
 
-  reveal: (result) => {
-    if (!get().lead) return; // gated behind lead capture
-    set({ step: "result", result, imageBase64: null });
+  // Store the analysis result as soon as it's computed (during the scan), without
+  // advancing the step — the result stays hidden until the lead gate is passed.
+  setResult: (result) => set({ result }),
+
+  reveal: () => {
+    // Gated behind lead capture; the result is already computed during the scan.
+    // The selfie + landmarks are kept (in memory only) so the result screen can
+    // show the user their own cropped treatment areas. reset() drops them.
+    if (!get().lead || !get().result) return;
+    set({ step: "result" });
   },
 
   clearImage: () => set({ imageBase64: null }),

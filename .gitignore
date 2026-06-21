@@ -43,3 +43,6 @@ next-env.d.ts
 certificates
 # local dev logs
 *.log
+
+# playwright mcp session logs
+.playwright-mcp/

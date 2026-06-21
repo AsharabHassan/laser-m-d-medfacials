@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ConsentCheckbox } from "@/components/compliance/ConsentCheckbox";
 import { DisclaimerBanner } from "@/components/compliance/DisclaimerBanner";
 import { CameraCapture } from "@/components/scan/CameraCapture";
+import { PhotoGuide } from "@/components/scan/PhotoGuide";
 import { useWizard, type MediaType } from "@/store/wizard-store";
 
 export function ConsentCaptureScreen() {
@@ -74,6 +75,8 @@ export function ConsentCaptureScreen() {
         </div>
       ) : (
         <div className="mt-8 space-y-5">
+          <PhotoGuide />
+
           <ConsentCheckbox checked={imageConsent} onChange={setImageConsent}>
             <span>
               <Lock size={13} className="mr-1 inline text-sage-deep" />I consent
