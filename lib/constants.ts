@@ -115,5 +115,3 @@ export const PRICE_GUIDE = {
 
 export const DISCLAIMER =
   "This tool offers general information to help you prepare for a consultation. It is not a medical assessment or diagnosis. Suitability for Endolift is confirmed in person by a qualified practitioner.";
-
-export const META_PIXEL_ID = "1309943261329384";

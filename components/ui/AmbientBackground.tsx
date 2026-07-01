@@ -1,21 +1,26 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { useLightFx } from "@/lib/use-light-fx";
 
 /**
  * Fixed, decorative "liquid glass" atmosphere: large, slow-morphing peach + sage
  * light blooms over the cream canvas, a faint iridescent sweep, and fine grain.
  * Slow + fluid by design (premium, not busy). Purely aesthetic; aria-hidden.
+ *
+ * On phones / reduced-motion the blooms hold still, the iridescent sweep is
+ * dropped, and the blur radius is dialed down — the continuous large-blur
+ * compositing is what makes mobile feel glitchy.
  */
 export function AmbientBackground() {
-  const reduce = useReducedMotion();
+  const reduce = useLightFx();
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       <div className="absolute inset-0 bg-cream" />
 
       <motion.div
-        className="absolute -left-[12%] -top-[18%] h-[62vh] w-[62vh] rounded-full bg-peach/35 blur-[120px]"
+        className="absolute -left-[12%] -top-[18%] h-[62vh] w-[62vh] rounded-full bg-peach/35 blur-[120px] max-md:blur-[60px]"
         animate={
           reduce
             ? undefined
@@ -24,7 +29,7 @@ export function AmbientBackground() {
         transition={{ duration: 34, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute -right-[14%] top-[14%] h-[55vh] w-[55vh] rounded-full bg-sage/28 blur-[130px]"
+        className="absolute -right-[14%] top-[14%] h-[55vh] w-[55vh] rounded-full bg-sage/28 blur-[130px] max-md:blur-[65px]"
         animate={
           reduce
             ? undefined
@@ -33,7 +38,7 @@ export function AmbientBackground() {
         transition={{ duration: 40, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-[-20%] left-[28%] h-[50vh] w-[50vh] rounded-full bg-peach-light/45 blur-[130px]"
+        className="absolute bottom-[-20%] left-[28%] h-[50vh] w-[50vh] rounded-full bg-peach-light/45 blur-[130px] max-md:blur-[65px]"
         animate={
           reduce
             ? undefined

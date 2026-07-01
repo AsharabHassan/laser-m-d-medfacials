@@ -27,6 +27,42 @@ export const RESULT_SCHEMA = {
       description:
         "0–30. How well the standout concern sits in an Endolift target area (jawline, jowls, under-chin, neck, mid-face). A concern squarely in these areas scores high. Judge only from this photo, with fine gradations.",
     },
+    lowerFaceObscured: {
+      type: "boolean",
+      description:
+        "True ONLY if a dense beard or heavy facial hair visibly hides the jawline, under-chin or neck so that skin cannot be reliably assessed from the photo. False for clean-shaven, light/patchy stubble, or any face where the lower-face skin is visible. A beard does NOT disqualify treatment — it only limits what the photo can show.",
+    },
+    areaEnhancements: {
+      type: "array",
+      description:
+        "For each Endolift target area whose skin you can ACTUALLY see and assess in THIS photo, an indicative cosmetic enhancement potential — roughly how much firmer, smoother or more defined that area could realistically look after Endolift, as a percentage 0–100. Higher for clearly treatable concerns (55–80), modest for subtle areas (30–50), low where little is needed (20–35). Do NOT include any area hidden by a beard or not clearly visible. 1–5 items, judged from this face with fine gradations.",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          area: {
+            type: "string",
+            enum: [
+              "under-eye",
+              "cheeks",
+              "mid-face",
+              "jawline",
+              "jowls",
+              "chin",
+              "under-chin",
+              "neck",
+            ],
+          },
+          enhancementPercent: { type: "number" },
+        },
+        required: ["area", "enhancementPercent"],
+      },
+    },
+    framingAdequate: {
+      type: "boolean",
+      description:
+        "True only if the photo clearly shows the LOWER face — the jawline, under-chin and ideally the neck — well enough to assess for skin tightening. False if the photo shows mostly the upper/mid face, the jaw/chin/neck is cut off or out of frame, the head is at too steep an angle, the face is too small/far, or it's a screenshot or not a clean front-facing selfie. When false the person should retake their photo.",
+    },
     headline: {
       type: "string",
       description: "A warm, 6–10 word headline for the result screen.",
@@ -53,6 +89,9 @@ export const RESULT_SCHEMA = {
     "laxityFit",
     "skinQuality",
     "areaFit",
+    "lowerFaceObscured",
+    "areaEnhancements",
+    "framingAdequate",
     "headline",
     "narrative",
     "observedAreas",

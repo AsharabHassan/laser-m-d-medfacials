@@ -25,6 +25,7 @@ export function ScanScreen() {
   const setResult = useWizard((s) => s.setResult);
   const setLandmarksStore = useWizard((s) => s.setLandmarks);
   const completeScan = useWizard((s) => s.completeScan);
+  const goToStep = useWizard((s) => s.goToStep);
   const reduce = useReducedMotion();
 
   const { detect, ready } = useFaceLandmarker();
@@ -85,8 +86,12 @@ export function ScanScreen() {
   // Advance to the lead gate only once the analysis result is in the store AND the
   // loader has run its minimum duration. If the API is slow, the loader holds.
   useEffect(() => {
-    if (result && minElapsed) completeScan();
-  }, [result, minElapsed, completeScan]);
+    if (!result || !minElapsed) return;
+    // If the photo didn't clearly show the lower face / neck, route to a retake
+    // prompt instead of giving a read we can't stand behind.
+    if (result.usedPhoto && !result.framingAdequate) goToStep("retake");
+    else completeScan();
+  }, [result, minElapsed, completeScan, goToStep]);
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center px-6 py-10">

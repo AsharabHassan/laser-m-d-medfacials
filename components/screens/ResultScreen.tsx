@@ -1,10 +1,12 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Sparkles, Info, Download, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useWizard } from "@/store/wizard-store";
 import { SuitabilityGauge } from "@/components/result/SuitabilityGauge";
-import { AreaFocus } from "@/components/result/AreaFocus";
+import { FaceConcernMap } from "@/components/result/FaceConcernMap";
 import { WhatToExpect } from "@/components/result/WhatToExpect";
 import { ResultsGallery } from "@/components/result/ResultsGallery";
 import { Testimonials } from "@/components/result/Testimonials";
@@ -21,10 +23,44 @@ const reveal = (delay: number) => ({
 
 export function ResultScreen() {
   const result = useWizard((s) => s.result);
+  const imageBase64 = useWizard((s) => s.imageBase64);
+  const imageMediaType = useWizard((s) => s.imageMediaType);
+  const landmarks = useWizard((s) => s.landmarks);
+  const lead = useWizard((s) => s.lead);
+  const [downloading, setDownloading] = useState(false);
+
   if (!result) return null;
 
   const meta = BUCKET_META[result.bucket];
   const { narrative } = result;
+
+  async function downloadReport() {
+    if (!result) return;
+    setDownloading(true);
+    try {
+      const { generateReportPdf } = await import("@/lib/report");
+      const blob = await generateReportPdf({
+        result,
+        imageBase64,
+        imageMediaType,
+        landmarks,
+        lead,
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const who = lead?.firstName ? `-${lead.firstName}` : "";
+      a.download = `Endolift-Report${who}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    } catch {
+      /* ignore — download is best-effort */
+    } finally {
+      setDownloading(false);
+    }
+  }
   const areas =
     narrative.observedAreas.length > 0
       ? narrative.observedAreas
@@ -73,8 +109,24 @@ export function ResultScreen() {
         </p>
       </motion.div>
 
+      {result.usedPhoto && result.lowerFaceObscured && (
+        <motion.div
+          {...reveal(0.55)}
+          className="mt-6 flex items-start gap-2.5 rounded-2xl border border-peach/30 bg-peach-light/25 px-4 py-3"
+        >
+          <Info size={16} className="mt-0.5 shrink-0 text-peach-deep" />
+          <p className="text-[13px] leading-relaxed text-body">
+            <span className="font-semibold text-heading">Beard noticed.</span> A
+            fuller beard hides the jawline, under-chin and neck, so we&rsquo;ve
+            kept the read light on those areas. Endolift works just as well under
+            a beard — Dr Stolte&rsquo;s team will confirm these precisely in
+            person.
+          </p>
+        </motion.div>
+      )}
+
       <motion.div {...reveal(0.6)} className="mt-10">
-        <AreaFocus />
+        <FaceConcernMap />
       </motion.div>
 
       <motion.div {...reveal(0.7)} className="mt-8">
@@ -91,6 +143,25 @@ export function ResultScreen() {
 
       <motion.div {...reveal(1)} className="mt-10">
         <BookingCTA label={meta.ctaLabel} />
+      </motion.div>
+
+      <motion.div {...reveal(1.05)} className="mt-4 flex justify-center">
+        <Button
+          variant="outline"
+          onClick={downloadReport}
+          disabled={downloading}
+        >
+          {downloading ? (
+            <>
+              <Loader2 size={16} className="animate-spin" /> Preparing your
+              report…
+            </>
+          ) : (
+            <>
+              <Download size={16} /> Download your report (PDF)
+            </>
+          )}
+        </Button>
       </motion.div>
 
       <motion.div {...reveal(1.1)}>

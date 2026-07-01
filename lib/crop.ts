@@ -16,8 +16,11 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /**
- * Crop the source image to `rect` (normalized 0–1 coords) and return a JPEG data
- * URL. Returns null if the image can't be loaded or the canvas is unavailable.
+ * Crop the source image around `rect` (normalized 0–1 coords) into a SQUARE JPEG
+ * data URL. The report renders these thumbnails in a square cell, so we frame a
+ * square region here (centred on the rect, grown to the rect's longer side and
+ * clamped to the photo) rather than a rectangle — otherwise the square cell
+ * stretches a non-square crop out of proportion. Returns null on failure.
  */
 export async function cropImage(
   base64: string,
@@ -26,17 +29,28 @@ export async function cropImage(
 ): Promise<string | null> {
   try {
     const img = await loadImage(`data:${mediaType};base64,${base64}`);
-    const sx = Math.round(rect.x * img.naturalWidth);
-    const sy = Math.round(rect.y * img.naturalHeight);
-    const sw = Math.max(1, Math.round(rect.w * img.naturalWidth));
-    const sh = Math.max(1, Math.round(rect.h * img.naturalHeight));
+    const nw = img.naturalWidth;
+    const nh = img.naturalHeight;
+
+    // Square side (in px) = the rect's longer edge, never larger than the photo.
+    let side = Math.max(rect.w * nw, rect.h * nh, 1);
+    side = Math.min(side, nw, nh);
+
+    // Centre the square on the rect, then clamp so it stays inside the photo.
+    const cx = (rect.x + rect.w / 2) * nw;
+    const cy = (rect.y + rect.h / 2) * nh;
+    let sx = Math.round(cx - side / 2);
+    let sy = Math.round(cy - side / 2);
+    const s = Math.round(side);
+    sx = Math.max(0, Math.min(sx, nw - s));
+    sy = Math.max(0, Math.min(sy, nh - s));
 
     const canvas = document.createElement("canvas");
-    canvas.width = sw;
-    canvas.height = sh;
+    canvas.width = s;
+    canvas.height = s;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+    ctx.drawImage(img, sx, sy, s, s, 0, 0, s, s);
     return canvas.toDataURL("image/jpeg", 0.9);
   } catch {
     return null;

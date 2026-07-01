@@ -19,6 +19,9 @@ const result: AnalyzeResult = {
   softFlagged: false,
   routedReason: "",
   usedPhoto: true,
+  lowerFaceObscured: false,
+  areaEnhancements: {},
+  framingAdequate: true,
   narrativeSource: "claude",
   narrative: { headline: "h", narrative: "n", observedAreas: [], encouragement: "e" },
 };

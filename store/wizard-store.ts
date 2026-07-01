@@ -10,7 +10,7 @@ import type { NormalizedPoint } from "@/components/scan/useFaceLandmarker";
 // the user their own cropped treatment areas; reset() drops everything.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type Step = "hero" | "consent" | "scan" | "lead" | "result";
+export type Step = "hero" | "consent" | "scan" | "retake" | "lead" | "result";
 
 export type MediaType = "image/jpeg" | "image/png" | "image/webp";
 
@@ -38,6 +38,7 @@ interface WizardState {
   clearImage: () => void;
   setError: (msg: string | null) => void;
   goToStep: (step: Step) => void;
+  retakePhoto: () => void;
   reset: () => void;
 }
 
@@ -93,6 +94,16 @@ export const useWizard = create<WizardState>((set, get) => ({
   setError: (msg) => set({ error: msg }),
 
   goToStep: (step) => set({ step }),
+
+  // Drop the current photo + read and return to the capture step for a retake
+  // (e.g. when the lower face / neck wasn't framed well enough to assess).
+  retakePhoto: () =>
+    set({
+      imageBase64: null,
+      landmarks: null,
+      result: null,
+      step: "consent",
+    }),
 
   reset: () => set({ ...initial }),
 }));

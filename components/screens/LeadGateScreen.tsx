@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/text-field";
 import { ConsentCheckbox } from "@/components/compliance/ConsentCheckbox";
 import { useWizard } from "@/store/wizard-store";
-import { requestAnalysis, submitLead } from "@/lib/api-client";
-import { META_PIXEL_ID } from "@/lib/constants";
+import {
+  requestAnalysis,
+  submitLead,
+  submitReportToGhl,
+} from "@/lib/api-client";
 import type { Lead } from "@/lib/types";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -17,6 +20,7 @@ export function LeadGateScreen() {
   const imageBase64 = useWizard((s) => s.imageBase64);
   const imageMediaType = useWizard((s) => s.imageMediaType);
   const imageConsent = useWizard((s) => s.imageConsent);
+  const landmarks = useWizard((s) => s.landmarks);
   const storedResult = useWizard((s) => s.result);
   const setLead = useWizard((s) => s.setLead);
   const setResult = useWizard((s) => s.setResult);
@@ -68,17 +72,17 @@ export function LeadGateScreen() {
       });
       setResult(result);
     }
-
-    const eventId = crypto.randomUUID();
-
-    // Fire browser Pixel Lead event — the eventID links to the server-side CAPI event
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (typeof window !== "undefined" && typeof (window as any).fbq === "function") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).fbq("track", "Lead", {}, { eventID: eventId });
-    }
-
-    await submitLead({ lead, result, eventId, metaPixelId: META_PIXEL_ID });
+    await submitLead({ lead, result });
+    // Generate the report PDF and deliver it to GoHighLevel (upload + attach to
+    // the contact + email the client). Fire-and-forget so the reveal isn't
+    // delayed; it no-ops if the GHL integration env isn't configured.
+    void submitReportToGhl({
+      result,
+      lead,
+      imageBase64,
+      imageMediaType,
+      landmarks,
+    });
     reveal();
   }
 

@@ -17,6 +17,9 @@ const result: AnalyzeResult = {
   softFlagged: false,
   routedReason: "ideal",
   usedPhoto: true,
+  lowerFaceObscured: false,
+  areaEnhancements: {},
+  framingAdequate: true,
   narrativeSource: "claude",
   narrative: {
     headline: "Endolift looks like a strong fit",

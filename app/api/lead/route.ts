@@ -43,8 +43,6 @@ export async function POST(request: Request): Promise<Response> {
     body.lead,
     body.result,
     new Date().toISOString(),
-    body.eventId,
-    body.metaPixelId,
   );
 
   let webhook: string | undefined;

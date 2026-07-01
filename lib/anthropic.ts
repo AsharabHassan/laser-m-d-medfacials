@@ -4,6 +4,7 @@ import type { Bucket, PhotoAssessment } from "./types";
 import { serverEnv } from "./env";
 import { SYSTEM_ENDOLIFT } from "./prompts/system-endolift";
 import { RESULT_SCHEMA } from "./prompts/result-schema";
+import { toRegionKey } from "./face-regions";
 import type { MediaType } from "@/store/wizard-store";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -75,6 +76,9 @@ export async function assessPhoto(params: {
     laxityFit: number;
     skinQuality: number;
     areaFit: number;
+    lowerFaceObscured: boolean;
+    areaEnhancements: { area: string; enhancementPercent: number }[];
+    framingAdequate: boolean;
     headline: string;
     narrative: string;
     observedAreas: string[];
@@ -101,9 +105,27 @@ export async function assessPhoto(params: {
     ? factors.reduce((a, b) => a + b, 0)
     : NaN;
 
+  // Map Claude's per-area enhancement estimates onto our region keys, clamped
+  // 0–100. Keep the strongest figure when two labels map to the same region.
+  const areaEnhancements: Record<string, number> = {};
+  if (Array.isArray(raw.areaEnhancements)) {
+    for (const item of raw.areaEnhancements) {
+      const region = toRegionKey(String(item?.area ?? ""));
+      const pct = Number(item?.enhancementPercent);
+      if (!region || !Number.isFinite(pct)) continue;
+      const v = Math.max(0, Math.min(100, Math.round(pct)));
+      if (areaEnhancements[region] === undefined || v > areaEnhancements[region]) {
+        areaEnhancements[region] = v;
+      }
+    }
+  }
+
   return {
     suitability: bucket,
     score,
+    lowerFaceObscured: raw.lowerFaceObscured === true,
+    areaEnhancements,
+    framingAdequate: raw.framingAdequate !== false,
     narrative: {
       headline: raw.headline,
       narrative: raw.narrative,

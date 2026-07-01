@@ -41,6 +41,9 @@ export function buildResult(
     narrative: assessment.narrative,
     narrativeSource: "claude",
     usedPhoto,
+    lowerFaceObscured: assessment.lowerFaceObscured,
+    areaEnhancements: assessment.areaEnhancements,
+    framingAdequate: assessment.framingAdequate,
   };
 }
 
@@ -62,5 +65,9 @@ export function genericFallbackResult(usedPhoto: boolean): AnalyzeResult {
     },
     narrativeSource: "fallback",
     usedPhoto,
+    lowerFaceObscured: false,
+    areaEnhancements: {},
+    // An analysis failure isn't a framing problem — don't push a retake here.
+    framingAdequate: true,
   };
 }

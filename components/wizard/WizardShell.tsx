@@ -10,6 +10,7 @@ import { StepTransition } from "./StepTransition";
 import { HeroScreen } from "@/components/screens/HeroScreen";
 import { ConsentCaptureScreen } from "@/components/screens/ConsentCaptureScreen";
 import { ScanScreen } from "@/components/screens/ScanScreen";
+import { RetakeScreen } from "@/components/screens/RetakeScreen";
 import { LeadGateScreen } from "@/components/screens/LeadGateScreen";
 import { ResultScreen } from "@/components/screens/ResultScreen";
 
@@ -17,6 +18,7 @@ const SCREENS = {
   hero: HeroScreen,
   consent: ConsentCaptureScreen,
   scan: ScanScreen,
+  retake: RetakeScreen,
   lead: LeadGateScreen,
   result: ResultScreen,
 } as const;
@@ -65,7 +67,7 @@ function CinematicHeader({
         animate={{ scaleX: 1 }}
         transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
       />
-      <div className="border-b border-white/30 bg-cream/55 backdrop-blur-xl">
+      <div className="border-b border-white/30 bg-cream/55 backdrop-blur-xl max-md:bg-cream/85 max-md:backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 sm:px-8">
           <Logo />
 

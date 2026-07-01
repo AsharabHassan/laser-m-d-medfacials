@@ -29,7 +29,16 @@ export async function POST(request: Request): Promise<Response> {
       imageMediaType,
     });
     return Response.json(buildResult(assessment, true));
-  } catch {
+  } catch (err) {
+    // Surface WHY the AI read failed (invalid API key, rate limit, bad request,
+    // etc.) so a misconfiguration doesn't silently masquerade as the user's photo
+    // being unreadable. We log only the error — never the image, which stays in
+    // this request scope and is never persisted. The user still gets a safe,
+    // on-brand consultation result so the flow never blocks.
+    console.error(
+      "[api/analyze] assessPhoto failed — returning consultation fallback:",
+      err instanceof Error ? `${err.name}: ${err.message}` : err,
+    );
     return Response.json(genericFallbackResult(true));
   }
   // imageBase64 goes out of scope here — never written anywhere.

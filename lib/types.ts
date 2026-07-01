@@ -78,6 +78,12 @@ export interface AnalyzeResult extends ScoreResult {
   narrativeSource: "claude" | "fallback";
   /** True when a photo was analyzed (vs. quiz-only path). */
   usedPhoto: boolean;
+  /** True when a dense beard hides the jawline/under-chin/neck from the photo read. */
+  lowerFaceObscured: boolean;
+  /** Indicative per-region enhancement potential (0–100), keyed by RegionKey. */
+  areaEnhancements: Record<string, number>;
+  /** False when the photo doesn't clearly show the lower face/neck — prompt a retake. */
+  framingAdequate: boolean;
 }
 
 /** Lead captured at the gate. */
@@ -105,13 +111,16 @@ export interface PhotoAssessment {
   /** Claude's 0–100 suitability score for this face; clamped to the bucket band. */
   score: number;
   narrative: ClaudeNarrative;
+  /** True when a dense beard hides the jawline/under-chin/neck from the photo read. */
+  lowerFaceObscured: boolean;
+  /** Indicative per-region enhancement potential (0–100), keyed by RegionKey. */
+  areaEnhancements: Record<string, number>;
+  /** False when the photo doesn't clearly show the lower face/neck — prompt a retake. */
+  framingAdequate: boolean;
 }
 
 /** Request body for POST /api/lead. */
 export interface LeadRequest {
   lead: Lead;
   result: AnalyzeResult;
-  /** Shared event ID for Meta browser Pixel ↔ Conversions API deduplication. */
-  eventId?: string;
-  metaPixelId?: string;
 }

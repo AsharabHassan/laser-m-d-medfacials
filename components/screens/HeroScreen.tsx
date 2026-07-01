@@ -1,11 +1,12 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWizard } from "@/store/wizard-store";
 import { EASE } from "@/lib/motion";
+import { useLightFx } from "@/lib/use-light-fx";
 
 export function HeroScreen() {
   const start = useWizard((s) => s.start);
@@ -86,7 +87,7 @@ function Dot() {
 /** Premium "AI analysis" centerpiece behind the headline: concentric rings, a
  *  slowly rotating conic scan-arc, and a soft pulsing glow. */
 function AuroraOrb() {
-  const reduce = useReducedMotion();
+  const reduce = useLightFx();
   return (
     <div
       aria-hidden
