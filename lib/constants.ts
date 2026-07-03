@@ -27,7 +27,7 @@ export const TRUST_MARKERS = [
 /** Booking + site URLs (overridable via public env at deploy). */
 export const BOOKING_URL =
   process.env.NEXT_PUBLIC_PHOREST_BOOKING_URL ??
-  "https://phorest.com/book/salons/medfacials";
+  "https://links.medfacials.com/widget/bookings/endolift-free-online-consultation";
 
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://endolift.medfacials.com";

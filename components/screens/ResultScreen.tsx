@@ -125,8 +125,16 @@ export function ResultScreen() {
         </motion.div>
       )}
 
+      <motion.div {...reveal(0.58)} className="mt-10">
+        <BookingCTA label="Book Free Consultation" />
+      </motion.div>
+
       <motion.div {...reveal(0.6)} className="mt-10">
         <FaceConcernMap />
+      </motion.div>
+
+      <motion.div {...reveal(0.68)} className="mt-10">
+        <BookingCTA label="Book Free Consultation" />
       </motion.div>
 
       <motion.div {...reveal(0.7)} className="mt-8">
