@@ -1,4 +1,4 @@
-import { Phone, Mail, Clock } from "lucide-react";
+import { Phone, Mail, Clock, MapPin } from "lucide-react";
 import { CLINIC, DISCLAIMER } from "@/lib/constants";
 import { Logo } from "./Logo";
 
@@ -20,6 +20,14 @@ export function ClinicFooter() {
               {l}
             </p>
           ))}
+          <a
+            href={CLINIC.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-white/80 underline-offset-4 transition hover:text-peach-light hover:underline"
+          >
+            <MapPin size={14} /> View on Google Maps
+          </a>
         </div>
 
         <div className="space-y-2 text-sm">

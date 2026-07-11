@@ -1,14 +1,21 @@
 "use client";
 
-import { CalendarHeart, Phone, Video } from "lucide-react";
+import { CalendarHeart, Gift, MapPin, Phone, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BOOKING_URL, VIRTUAL_BOOKING_URL, CLINIC } from "@/lib/constants";
+import {
+  BOOKING_URL,
+  VIRTUAL_BOOKING_URL,
+  CLINIC,
+  VOUCHER,
+} from "@/lib/constants";
 
 /**
- * The dual conversion CTA. PRIMARY: the free in-clinic consultation at Lemon
- * Street (which carries the £100 voucher promise). SECONDARY, visually
- * subordinate: a free virtual video consultation for people who can't get to
- * Truro yet. Both are plain GHL calendar links — never form_embed.js.
+ * The dual conversion CTA. PRIMARY: the free IN-CLINIC consultation at the
+ * Truro clinic (which carries the £100 any-treatment voucher promise) — with
+ * the address + Google Maps link right underneath so nobody wonders where to
+ * go. SECONDARY, visually subordinate: a free online video consultation for
+ * people who can't get to Truro yet. Both are plain GHL calendar links —
+ * never form_embed.js.
  */
 export function DualBookingCTA({
   label = "Book my free in-clinic consultation",
@@ -29,10 +36,22 @@ export function DualBookingCTA({
           <CalendarHeart size={18} /> {label}
         </Button>
       </a>
+
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-peach-light/60 px-3.5 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-peach-deep">
+        <Gift size={13} /> Includes your {VOUCHER.amount} voucher · any
+        treatment
+      </span>
+
       {!compact && (
-        <p className="text-[11.5px] font-medium uppercase tracking-[0.14em] text-peach-deep">
-          Includes your £100 welcome voucher
-        </p>
+        <a
+          href={CLINIC.mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 text-[12.5px] font-medium text-heading/80 underline-offset-4 transition hover:text-peach-deep hover:underline"
+        >
+          <MapPin size={13} className="shrink-0 text-peach-deep" />
+          In clinic at {CLINIC.addressLines[0]}, Truro · Get directions
+        </a>
       )}
 
       <a
@@ -42,7 +61,7 @@ export function DualBookingCTA({
         className="flex items-center gap-2 text-sm font-medium text-sage-deep underline-offset-4 transition hover:text-heading hover:underline"
       >
         <Video size={14} /> Can&rsquo;t get to Truro just yet? Book a free
-        virtual consultation
+        online consultation
       </a>
 
       {!compact && (

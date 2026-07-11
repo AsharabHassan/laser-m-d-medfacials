@@ -425,11 +425,11 @@ export function buildReportPdf(input: ReportInput): Blob {
     y += 22;
   }
 
-  ensure(20);
+  ensure(25);
   doc.setFillColor(...P.panel);
   doc.setDrawColor(...P.gold);
   doc.setLineWidth(0.3);
-  doc.roundedRect(M, y, CW, 17, 2.5, 2.5, "FD");
+  doc.roundedRect(M, y, CW, 22, 2.5, 2.5, "FD");
   doc.setFont("times", "normal");
   doc.setFontSize(13);
   doc.setTextColor(...P.goldLt);
@@ -438,6 +438,13 @@ export function buildReportPdf(input: ReportInput): Blob {
   doc.setFontSize(8.5);
   doc.setTextColor(...P.body);
   doc.text(`${input.bookingUrl}   ·   ${input.phone}`, M + 7, y + 12.5);
+  doc.setFontSize(8);
+  doc.setTextColor(...P.heading);
+  doc.text(
+    `Visit us: ${input.clinicName}, ${input.addressLines.join(", ")}`,
+    M + 7,
+    y + 17.5,
+  );
 
   footer();
   return doc.output("blob");

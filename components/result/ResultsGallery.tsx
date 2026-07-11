@@ -5,24 +5,27 @@ import { Sparkles } from "lucide-react";
 import { BeforeAfterSlider } from "./BeforeAfterSlider";
 import { EASE } from "@/lib/motion";
 
-// Consented MEDfacials before/after pairs. PLACEHOLDER: these are the clinic's
-// existing case photos — swap in real LaseMD Ultra cases as the client approves
-// them (same filenames in /public/results, or extend this list).
+// LaseMD Ultra before/after creatives (client-supplied, 1200px webp).
 // Both sliders share one frame size for a balanced grid; each photo is shown
 // fully (object-contain) inside that frame, letterboxed where its native ratio
 // differs from the frame.
-const FRAME_RATIO = "4 / 3";
+const FRAME_RATIO = "1 / 1";
 
 const CASES = [
   {
-    area: "skin tone and texture",
-    before: "/results/neck-before.jpg",
-    after: "/results/neck-after.jpg",
+    area: "fine lines and skin texture",
+    before: "/results/ba1-before.webp",
+    after: "/results/ba1-after.webp",
   },
   {
-    area: "under-eye brightness",
-    before: "/results/eyes-before.jpg",
-    after: "/results/eyes-after.jpg",
+    area: "pigmentation and tone",
+    before: "/results/ba2-before.webp",
+    after: "/results/ba2-after.webp",
+  },
+  {
+    area: "breakout-prone texture",
+    before: "/results/ba3-before.webp",
+    after: "/results/ba3-after.webp",
   },
 ] as const;
 
@@ -31,14 +34,16 @@ export function ResultsGallery() {
     <div>
       <div className="flex items-center justify-center gap-2 text-center">
         <Sparkles size={14} className="text-peach-deep" />
-        <h3 className="font-serif text-xl text-heading">Real results, real patients</h3>
+        <h3 className="font-serif text-xl text-heading">
+          The LaseMD Ultra difference
+        </h3>
       </div>
       <p className="mx-auto mt-1 max-w-md text-center text-[13px] leading-relaxed text-body/80">
-        Actual results from Dr Stolte&apos;s team in Truro. Individual results
-        vary — yours is confirmed at your consultation.
+        Representative results for the concerns LaseMD Ultra treats. Individual
+        results vary — yours is confirmed at your consultation.
       </p>
 
-      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+      <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {CASES.map((c, i) => (
           <motion.div
             key={c.area}

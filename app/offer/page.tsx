@@ -4,6 +4,7 @@ import {
   BadgeCheck,
   CalendarHeart,
   Gift,
+  MapPin,
   ScanFace,
   ShieldCheck,
   Stethoscope,
@@ -48,8 +49,8 @@ const TRUST_CARDS = [
   },
   {
     icon: Gift,
-    title: `${VOUCHER.amount} welcome voucher`,
-    copy: "Attend your free in-clinic consultation and a £100 voucher is yours — redeemable against your LaseMD Ultra treatment plan.",
+    title: `${VOUCHER.amount} welcome voucher — any treatment`,
+    copy: "Attend your free in-clinic consultation and a £100 voucher is yours — valid on any treatment at MEDfacials, not just LaseMD Ultra.",
   },
 ] as const;
 
@@ -196,7 +197,19 @@ export default function OfferPage() {
             <p className="mx-auto mt-2 max-w-lg text-center text-sm text-body/80">
               At our Lemon Street clinic in Truro. Dr Stolte&apos;s team will
               assess your skin, build your personal plan — and your{" "}
-              {VOUCHER.amount} welcome voucher is yours for attending.
+              {VOUCHER.amount} welcome voucher (valid on any treatment) is
+              yours for attending.
+            </p>
+            <p className="mt-2 text-center">
+              <a
+                href={CLINIC.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[13px] font-medium text-heading/80 underline-offset-4 transition hover:text-peach-deep hover:underline"
+              >
+                <MapPin size={13} className="text-peach-deep" />
+                {CLINIC.name}, {CLINIC.addressLines.join(", ")} · Get directions
+              </a>
             </p>
             <div className="mt-7">
               <BookingCalendar />

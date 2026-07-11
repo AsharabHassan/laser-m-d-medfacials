@@ -63,8 +63,8 @@ export function OfferHero() {
         >
           You recently checked your LaseMD Ultra suitability with {CLINIC.name}.
           Book your free in-clinic consultation at Lemon Street below — attend
-          and a {VOUCHER.amount} welcome voucher is yours to redeem against your
-          treatment plan.
+          and a {VOUCHER.amount} welcome voucher is yours, valid on any
+          treatment at the clinic.
         </motion.p>
 
         <motion.div

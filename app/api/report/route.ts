@@ -47,12 +47,14 @@ export async function POST(request: Request): Promise<Response> {
       <strong>${CLINIC.name}</strong> ${CLINIC.byline}. Your personalised report is
       attached as a PDF.</p>
       <p>It's a guide to help you prepare — your suitability is always confirmed in
-      person. Book your free in-clinic consultation at Lemon Street and a
-      <strong>${VOUCHER.amount} welcome voucher</strong> is yours to redeem against
-      your treatment plan.</p>
+      person. Book your free <strong>in-clinic consultation</strong> at our Truro
+      clinic and a <strong>${VOUCHER.amount} welcome voucher</strong> is yours —
+      valid on <strong>any treatment</strong> at ${CLINIC.name}, not just LaseMD Ultra.</p>
       <p><a href="${BOOKING_URL}" style="color:#c97c4a;font-weight:bold">Book your free in-clinic consultation →</a></p>
+      <p style="font-size:13px">📍 Find us: ${CLINIC.name}, ${CLINIC.addressLines.join(", ")} —
+      <a href="${CLINIC.mapsUrl}" style="color:#c97c4a">view on Google Maps</a>.</p>
       <p style="font-size:13px">Can't get to Truro just yet?
-      <a href="${VIRTUAL_BOOKING_URL}" style="color:#6f8d8c">Book a free virtual video consultation instead</a>.</p>
+      <a href="${VIRTUAL_BOOKING_URL}" style="color:#6f8d8c">Book a free online consultation instead</a>.</p>
       <p style="color:#757575">— ${CLINIC.name}, ${CLINIC.tagline}</p>
     </div>`;
 

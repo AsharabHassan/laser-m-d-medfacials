@@ -15,6 +15,9 @@ export const CLINIC = {
   phoneHref: "tel:+441872229740",
   email: "contact@medfacials.com",
   hours: "Mon–Fri 9–6 · Sat 9–2",
+  /** Google Maps link so in-clinic visitors know exactly where to come. */
+  mapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=MEDfacials%2C%20Kent%20House%2C%2014%2F15%20Lemon%20Street%2C%20Truro%20TR1%202LS",
 } as const;
 
 export const TRUST_MARKERS = [
@@ -30,11 +33,11 @@ export const TRUST_MARKERS = [
  *  VIRTUAL_BOOKING_URL is the fallback — a free virtual video consultation. */
 export const BOOKING_URL =
   process.env.NEXT_PUBLIC_BOOKING_URL ??
-  "https://links.medfacials.com/widget/bookings/lasermd-free-in-clinic-consultation";
+  "https://links.medfacials.com/widget/bookings/book-laser-m-d-treatment";
 
 export const VIRTUAL_BOOKING_URL =
   process.env.NEXT_PUBLIC_VIRTUAL_BOOKING_URL ??
-  "https://links.medfacials.com/widget/bookings/lasermd-free-virtual-consultation";
+  "https://links.medfacials.com/widget/bookings/endolift-free-online-consultation";
 
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://lasermd.medfacials.com";
@@ -120,7 +123,8 @@ export const VOUCHER = {
   amount: "£100",
   title: "£100 Welcome Voucher",
   promise:
-    "Yours when you attend your free in-clinic consultation at Lemon Street — redeem against your LaseMD Ultra treatment plan.",
+    "Yours when you attend your free in-clinic consultation at our Truro clinic — and it's not just for LaseMD Ultra: spend it on any treatment at MEDfacials.",
+  anyTreatment: "Valid on any treatment",
   urgency: "Consultation places at our Truro clinic are limited each month.",
 } as const;
 

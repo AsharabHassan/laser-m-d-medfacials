@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { useRef, useState } from "react";
-import { Sparkles, Info, Download, Loader2 } from "lucide-react";
+import { Sparkles, Info, Download, Gift, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWizard } from "@/store/wizard-store";
 import { SuitabilityGauge } from "@/components/result/SuitabilityGauge";
@@ -85,6 +85,10 @@ export function ResultScreen() {
         <h2 className="mt-4 font-serif text-[32px] leading-tight text-heading sm:text-[40px]">
           {narrative.headline}
         </h2>
+        <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-peach/50 bg-peach-light/40 px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-peach-deep">
+          <Gift size={13} /> £100 welcome voucher with your free in-clinic
+          consultation
+        </span>
       </motion.div>
 
       <motion.div {...reveal(0.25)} className="mt-8 flex justify-center">

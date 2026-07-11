@@ -69,7 +69,7 @@ export function StickyBookingBar({ watchEndRef }: {
             className="flex h-14 items-center justify-center gap-2 rounded-full bg-peach px-6 text-[15px] font-semibold text-white shadow-glow transition active:scale-[0.98]"
           >
             <CalendarHeart size={18} />
-            Book free consultation · £100 voucher
+            Book free in-clinic consult · £100 voucher
           </a>
         </motion.div>
       )}
