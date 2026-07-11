@@ -48,14 +48,23 @@ describe("score bands (never-reject)", () => {
     }
   });
 
-  it("keeps an in-band Claude score untouched", () => {
-    expect(scoreInBucket("excellent", 91)).toBe(91);
-    expect(scoreInBucket("great", 80)).toBe(80);
-    expect(scoreInBucket("good", 70)).toBe(70);
-    expect(scoreInBucket("consultation", 65)).toBe(65);
+  it("rescales raw scores monotonically within each bucket band", () => {
+    for (const bucket of BUCKETS) {
+      const low = scoreInBucket(bucket, 55);
+      const mid = scoreInBucket(bucket, 75);
+      const high = scoreInBucket(bucket, 95);
+      expect(low).toBeLessThanOrEqual(mid);
+      expect(mid).toBeLessThanOrEqual(high);
+    }
   });
 
-  it("clamps an out-of-band score into the bucket band", () => {
+  it("spreads nearby raw scores instead of flattening them onto the band floor", () => {
+    // Two honest-but-different raw sums must not display identically.
+    expect(scoreInBucket("great", 68)).not.toBe(scoreInBucket("great", 76));
+    expect(scoreInBucket("good", 60)).not.toBe(scoreInBucket("good", 70));
+  });
+
+  it("keeps out-of-range raw scores inside the bucket band", () => {
     expect(scoreInBucket("excellent", 55)).toBe(86);
     expect(scoreInBucket("good", 99)).toBe(82);
   });

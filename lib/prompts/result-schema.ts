@@ -15,17 +15,17 @@ export const RESULT_SCHEMA = {
     concernClarity: {
       type: "number",
       description:
-        "0–40. How CLEARLY LaseMD-treatable skin concerns are visible (pigmentation, sun damage, redness, texture, pores, fine lines, dullness). Clear, visible concerns score HIGH — this is exactly who LaseMD Ultra helps. Near-flawless skin scores mid (glow and maintenance still benefit), never near zero. Judge ONLY from this photo, with fine gradations — avoid identical values across different faces.",
+        "0–40. How CLEARLY LaseMD-treatable skin concerns are visible (pigmentation, sun damage, redness, texture, pores, fine lines, dullness). Clear, obvious concerns 30–39; moderate visible concerns 24–31; subtle glow-and-maintenance skin 18–26 — never near zero. Judge ONLY from this photo, with fine gradations — vary the exact digits so different faces never score the same.",
     },
     skinReadiness: {
       type: "number",
       description:
-        "0–30. Apparent skin health and resilience for a gentle fractional laser. Be lenient — LaseMD Ultra tolerates most skin well; score high unless the skin looks acutely irritated or compromised. Judge only from this photo, with fine gradations.",
+        "0–30. Apparent skin health and resilience for a gentle fractional laser. Be lenient — LaseMD Ultra tolerates most skin well: healthy-looking skin 25–30, average 21–27; only acutely irritated or compromised skin lower. Judge only from this photo, with fine gradations.",
     },
     rejuvenationPotential: {
       type: "number",
       description:
-        "0–30. How much visible improvement is realistically achievable for this face — brighter, clearer, smoother, more even. Judge only from this photo, with fine gradations.",
+        "0–30. How much visible improvement is realistically achievable for this face — brighter, clearer, smoother, more even. Clear concerns 23–29; moderate 19–25; subtle 16–22 (even great skin gains glow). Judge only from this photo, with fine gradations.",
     },
     lowerFaceObscured: {
       type: "boolean",

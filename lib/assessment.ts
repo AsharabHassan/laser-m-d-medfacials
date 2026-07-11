@@ -5,8 +5,11 @@ import type { AnalyzeResult, Bucket, PhotoAssessment } from "./types";
 // generic fallback (always "consultation") for when the vision call fails.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Per-bucket display bands. Claude's raw score is clamped into the band for the
-// outcome it chose, so the number varies photo-to-photo while staying coherent
+// Per-bucket display bands. Claude's raw factor sum is RESCALED into the band
+// for the outcome it chose (not merely clamped): honest raw sums for a bucket
+// tend to sit below its display band, and a hard clamp flattens every visitor
+// in that bucket onto the band floor. Mapping the plausible raw range linearly
+// onto the band keeps the number varying photo-to-photo while staying coherent
 // with the verdict (and within each bucket's gauge band in lib/constants.ts).
 // The floor is 62 — a result should never read as a fail.
 const BANDS: Record<Bucket, [number, number]> = {
@@ -16,11 +19,22 @@ const BANDS: Record<Bucket, [number, number]> = {
   consultation: [62, 74],
 };
 
-/** Clamp Claude's 0–100 score into the chosen bucket's band. */
+// The raw factor-sum range Claude realistically produces for each outcome
+// (from the anchored guidance in lib/prompts/system-lasermd.ts).
+const RAW_RANGE: Record<Bucket, [number, number]> = {
+  excellent: [74, 97],
+  great: [64, 92],
+  good: [56, 86],
+  consultation: [45, 78],
+};
+
+/** Rescale Claude's 0–100 raw score into the chosen bucket's display band. */
 export function scoreInBucket(bucket: Bucket, score: number): number {
   const [lo, hi] = BANDS[bucket];
   if (!Number.isFinite(score)) return Math.round((lo + hi) / 2);
-  return Math.max(lo, Math.min(hi, Math.round(score)));
+  const [rlo, rhi] = RAW_RANGE[bucket];
+  const t = Math.max(0, Math.min(1, (score - rlo) / (rhi - rlo)));
+  return Math.round(lo + t * (hi - lo));
 }
 
 /** Band midpoint — used when there's no Claude score (error fallback). */

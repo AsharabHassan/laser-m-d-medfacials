@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { CalendarHeart } from "lucide-react";
 import { BOOKING_URL } from "@/lib/constants";
@@ -10,18 +11,30 @@ import { EASE } from "@/lib/motion";
  * Mobile sticky bottom CTA bar. Appears once the visitor has scrolled past the
  * first screenful of the result (they've seen their score + voucher) and stays
  * until the page's final CTA block scrolls into view, so it never doubles up.
+ * Rendered through a portal to <body>: the wizard's StepTransition wrapper
+ * carries a motion transform, which would otherwise become the containing
+ * block for position:fixed and pin the bar to the page instead of the viewport.
  */
 export function StickyBookingBar({ watchEndRef }: {
   watchEndRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [nearEnd, setNearEnd] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.9);
-    onScroll();
+    const raf = requestAnimationFrame(onScroll);
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -37,7 +50,9 @@ export function StickyBookingBar({ watchEndRef }: {
 
   const visible = scrolled && !nearEnd;
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {visible && (
         <motion.div
@@ -58,6 +73,7 @@ export function StickyBookingBar({ watchEndRef }: {
           </a>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
