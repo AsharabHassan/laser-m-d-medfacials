@@ -7,10 +7,10 @@ import { useWizard } from "@/store/wizard-store";
 import { EASE } from "@/lib/motion";
 
 /**
- * Shown when the photo didn't clearly capture the lower face / neck — the areas
- * Endolift treats. We ask for a camera retake rather than presenting a read we
- * can't stand behind. A subtle escape hatch lets the determined user continue to
- * a (gently-worded) result anyway.
+ * Shown when the photo didn't clearly capture the face — the skin LaseMD Ultra
+ * treats. We ask for a camera retake rather than presenting a read we can't
+ * stand behind. A subtle escape hatch lets the determined user continue to a
+ * (gently-worded) result anyway.
  */
 export function RetakeScreen() {
   const retakePhoto = useWizard((s) => s.retakePhoto);
@@ -35,13 +35,11 @@ export function RetakeScreen() {
         </h2>
         <p className="mt-3 text-[15px] leading-relaxed text-body">
           We couldn&rsquo;t clearly see your{" "}
-          <span className="font-medium text-heading">
-            jawline, under-chin and neck
-          </span>{" "}
-          — the areas Endolift works on. For an accurate read, retake your photo
+          <span className="font-medium text-heading">whole face</span> — the
+          skin LaseMD Ultra works on. For an accurate read, retake your photo
           with the <span className="font-medium text-heading">camera</span>,
-          holding it a little further back with your chin level so your whole
-          lower face and neck are in frame.
+          holding it a little further back in even light so your face is in
+          frame from forehead to chin.
         </p>
 
         <Button size="lg" onClick={retakePhoto} className="mt-8 w-full">

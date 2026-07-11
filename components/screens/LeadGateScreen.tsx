@@ -95,14 +95,14 @@ export function LeadGateScreen() {
         className="rounded-[2rem] border border-peach/30 bg-white/75 p-7 shadow-soft backdrop-blur"
       >
         <span className="inline-flex items-center gap-2 rounded-full bg-peach-light/50 px-3 py-1 text-xs font-semibold text-peach-deep">
-          <Sparkles size={13} /> Your guide is ready
+          <Sparkles size={13} /> Your skin analysis is ready
         </span>
         <h2 className="mt-4 font-serif text-[30px] leading-tight text-heading">
-          Where shall we send your result?
+          Where shall we send your report?
         </h2>
         <p className="mt-2 text-sm text-body">
-          See your personalised Endolift suitability guide and we&rsquo;ll keep a
-          copy for your free consultation.
+          See your personalised LaseMD Ultra skin analysis — we&rsquo;ll email
+          you the full report and keep a copy for your free consultation.
         </p>
 
         <form onSubmit={submit} className="mt-6 space-y-4">

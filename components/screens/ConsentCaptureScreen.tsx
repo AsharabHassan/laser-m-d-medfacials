@@ -57,8 +57,8 @@ export function ConsentCaptureScreen() {
         A quick photo to begin
       </h2>
       <p className="mt-3 text-body">
-        Our AI gently maps your lower face to tailor your result. Your photo is
-        analysed once and then{" "}
+        Our AI gently reads your skin&rsquo;s tone, texture and radiance to
+        tailor your result. Your photo is analysed once and then{" "}
         <span className="font-semibold text-heading">deleted immediately</span>{" "}
         — never stored.
       </p>

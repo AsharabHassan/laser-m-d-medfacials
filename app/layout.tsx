@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Castoro, Mulish } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { SITE_URL } from "@/lib/constants";
 
-// Meta (Facebook) Pixel — hardcoded per client request.
-const META_PIXEL_ID = "1309943261329384";
+// Meta (Facebook) Pixel — the clinic's existing pixel, overridable per deploy.
+const META_PIXEL_ID =
+  process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "1309943261329384";
 
 const castoro = Castoro({
   weight: "400",
@@ -23,19 +24,26 @@ const mulish = Mulish({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Is Endolift right for you? · MEDfacials, Truro",
+  title: "Free AI Skin Analysis · LaseMD Ultra · MEDfacials, Truro",
   description:
-    "A 60-second suitability guide for Endolift — Cornwall's certified non-surgical skin-tightening treatment with Dr Joe Stolte at MEDfacials, Truro.",
+    "Take a 30-second AI skin scan and discover what LaseMD Ultra laser skin rejuvenation could do for your skin — with a personalised report and a £100 welcome voucher, doctor-led at MEDfacials, Truro.",
   openGraph: {
-    title: "Discover if Endolift is right for you · MEDfacials",
+    title: "Reveal your skin's natural brilliance · MEDfacials",
     description:
-      "Take the 60-second Endolift suitability analysis with Cornwall's only certified Endolift provider.",
+      "A free 30-second AI skin analysis for LaseMD Ultra — personalised suitability report, plus a £100 welcome voucher when you book your free in-clinic consultation.",
     url: SITE_URL,
     siteName: "MEDfacials",
     locale: "en_GB",
     type: "website",
   },
   robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#fff8ee",
 };
 
 export default function RootLayout({

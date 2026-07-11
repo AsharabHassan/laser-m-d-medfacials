@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { assessFace, isQuizComplete } from "@/lib/quality-gate";
-import type { QuizAnswers } from "@/lib/types";
+import { assessFace } from "@/lib/quality-gate";
 
 describe("assessFace", () => {
   it("is not ready when no face is detected", () => {
@@ -36,38 +35,5 @@ describe("assessFace", () => {
   it("is ready for a well-framed single face", () => {
     const r = assessFace({ faceCount: 1, coverage: 0.4, offCenter: 0.1 });
     expect(r.ok).toBe(true);
-  });
-});
-
-describe("isQuizComplete", () => {
-  const full: QuizAnswers = {
-    laxity: "firm",
-    areas: ["jawline"],
-    age: "46-55",
-    skin: "healthy",
-    pregnant: "no",
-    conditions: ["none"],
-    smoker: "no",
-    recentTreatment: "no",
-    expectation: "subtle",
-    goodHealth: "yes",
-  };
-
-  it("accepts a fully answered quiz", () => {
-    expect(isQuizComplete(full)).toBe(true);
-  });
-
-  it("rejects when a single-choice answer is missing", () => {
-    const { laxity, ...rest } = full;
-    void laxity;
-    expect(isQuizComplete(rest)).toBe(false);
-  });
-
-  it("rejects when no area of concern is selected", () => {
-    expect(isQuizComplete({ ...full, areas: [] })).toBe(false);
-  });
-
-  it("rejects when no condition (incl. 'none') is selected", () => {
-    expect(isQuizComplete({ ...full, conditions: [] })).toBe(false);
   });
 });

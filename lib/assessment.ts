@@ -8,11 +8,12 @@ import type { AnalyzeResult, Bucket, PhotoAssessment } from "./types";
 // Per-bucket display bands. Claude's raw score is clamped into the band for the
 // outcome it chose, so the number varies photo-to-photo while staying coherent
 // with the verdict (and within each bucket's gauge band in lib/constants.ts).
+// The floor is 62 — a result should never read as a fail.
 const BANDS: Record<Bucket, [number, number]> = {
-  great: [80, 99],
-  good: [62, 86],
-  consultation: [50, 74],
-  alternative: [38, 62],
+  excellent: [86, 96],
+  great: [76, 89],
+  good: [67, 82],
+  consultation: [62, 74],
 };
 
 /** Clamp Claude's 0–100 score into the chosen bucket's band. */
@@ -22,7 +23,7 @@ export function scoreInBucket(bucket: Bucket, score: number): number {
   return Math.max(lo, Math.min(hi, Math.round(score)));
 }
 
-/** Band midpoint — used when there's no Claude score (no-photo / error fallback). */
+/** Band midpoint — used when there's no Claude score (error fallback). */
 export function scoreForBucket(bucket: Bucket): number {
   const [lo, hi] = BANDS[bucket];
   return Math.round((lo + hi) / 2);
@@ -35,14 +36,12 @@ export function buildResult(
   return {
     bucket: assessment.suitability,
     score: scoreInBucket(assessment.suitability, assessment.score),
-    hardFlags: [],
-    softFlagged: false,
-    routedReason: "",
     narrative: assessment.narrative,
     narrativeSource: "claude",
     usedPhoto,
     lowerFaceObscured: assessment.lowerFaceObscured,
-    areaEnhancements: assessment.areaEnhancements,
+    skinConcerns: assessment.skinConcerns,
+    primaryConcern: assessment.primaryConcern,
     framingAdequate: assessment.framingAdequate,
   };
 }
@@ -52,13 +51,10 @@ export function genericFallbackResult(usedPhoto: boolean): AnalyzeResult {
   return {
     bucket: "consultation",
     score: scoreForBucket("consultation"),
-    hardFlags: [],
-    softFlagged: false,
-    routedReason: "",
     narrative: {
-      headline: "Let's confirm your fit in person",
+      headline: "Let's build your personalised skin protocol",
       narrative:
-        "We couldn't fully read your photo this time, but that's no problem at all. The surest way to know whether Endolift is right for you is a quick look in person with Dr Stolte's team.",
+        "We couldn't fully read your photo this time, but that's no problem at all. The surest way to build your personalised LaseMD Ultra protocol is a quick, friendly consultation with Dr Stolte's team.",
       observedAreas: [],
       encouragement:
         "Book your free, no-pressure consultation in Truro whenever you're ready — we'll talk you through everything.",
@@ -66,7 +62,8 @@ export function genericFallbackResult(usedPhoto: boolean): AnalyzeResult {
     narrativeSource: "fallback",
     usedPhoto,
     lowerFaceObscured: false,
-    areaEnhancements: {},
+    skinConcerns: [],
+    primaryConcern: null,
     // An analysis failure isn't a framing problem — don't push a retake here.
     framingAdequate: true,
   };

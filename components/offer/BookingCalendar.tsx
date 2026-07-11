@@ -17,8 +17,8 @@ export function BookingCalendar() {
       <div className="overflow-hidden rounded-2xl border border-sage/20 bg-white shadow-soft">
         <iframe
           src={OFFER.calendarUrl}
-          title="Book your free Endolift online consultation"
-          id="endolift-consult-calendar"
+          title="Book your free LaseMD Ultra in-clinic consultation"
+          id="lasermd-consult-calendar"
           className="block h-[1120px] w-full border-0 max-sm:h-[980px]"
         />
       </div>

@@ -1,88 +1,58 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Domain model for the Endolift Suitability Analyzer.
-// The scoring engine (lib/scoring.ts) is authoritative over `Bucket`; Claude only
-// ever writes narrative copy — it never decides suitability.
+// Domain model for the LaserMD Suitability Analyzer (Lutronic LaseMD Ultra).
+// Claude Vision chooses the suitability outcome and identifies the visible skin
+// concerns; the server clamps the score into the outcome's display band.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** The four suitability outcomes. Never a flat "you don't qualify". */
-export type Bucket = "great" | "good" | "consultation" | "alternative";
+export type Bucket = "excellent" | "great" | "good" | "consultation";
 
-/** Areas of concern a respondent can select. */
-export type AreaId =
-  | "jawline"
-  | "chin"
-  | "neck"
-  | "cheeks"
-  | "undereye"
-  | "body";
+/** Skin concerns LaseMD Ultra treats, as identified from the photo. */
+export type ConcernKey =
+  | "pigmentation"
+  | "redness"
+  | "texture"
+  | "fine-lines"
+  | "dullness";
 
-/** Medical conditions screened in the contraindication question. */
-export type ConditionId =
-  | "infection"
-  | "bloodThinners"
-  | "autoimmune"
-  | "photosensitivity"
-  | "keloid"
-  | "systemic"
-  | "none";
-
-/** Structured, typed answers produced by the quiz. */
-export interface QuizAnswers {
-  laxity: "firm" | "early" | "noticeable" | "severe" | "unsure";
-  areas: AreaId[];
-  age: "under25" | "25-35" | "36-45" | "46-55" | "56-65" | "over65";
-  skin: "healthy" | "thin-sun" | "very-thin";
-  pregnant: "yes" | "no";
-  conditions: ConditionId[];
-  smoker: "no" | "willing" | "not-willing";
-  recentTreatment: "no" | "yes";
-  expectation: "subtle" | "moderate" | "dramatic";
-  goodHealth: "yes" | "partly" | "no";
+/** A single skin concern Claude observed, tied to a face region. */
+export interface SkinConcern {
+  concern: ConcernKey;
+  /** The face region where the concern is most visible (RegionKey). */
+  region: string;
+  /** Indicative cosmetic improvement potential (0–100), clamped server-side. */
+  improvementPercent: number;
+  /** One short, observational, non-diagnostic sentence about THIS face. */
+  observation: string;
 }
 
-/** Machine-readable reason a hard flag fired. */
-export type HardFlag =
-  | "pregnancy"
-  | "active-infection"
-  | "medical-condition"
-  | "severe-laxity"
-  | "dramatic-expectation"
-  | "poor-health";
-
-/** Output of the deterministic scoring engine. */
-export interface ScoreResult {
-  bucket: Bucket;
-  /** 0–100 normalized suitability score (presentational). */
-  score: number;
-  hardFlags: HardFlag[];
-  /** True when a soft flag forced a consultation routing. */
-  softFlagged: boolean;
-  /** Short, human-readable reason for the routing (used as a fallback narrative seed). */
-  routedReason: string;
-}
-
-/** The narrative portion Claude is allowed to author (no bucket, no score). */
+/** The narrative portion Claude authors alongside the structured read. */
 export interface ClaudeNarrative {
   headline: string;
-  /** 2–3 short paragraphs, personalized-but-careful, cosmetic not diagnostic. */
+  /** 2–3 short sentences, personalized-but-careful, cosmetic not diagnostic. */
   narrative: string;
-  /** Areas Claude observed/affirmed, phrased in general terms. */
+  /** Concerns Claude observed, phrased in general terms. */
   observedAreas: string[];
   encouragement: string;
 }
 
 /** The full result returned by /api/analyze and rendered on the result screen. */
-export interface AnalyzeResult extends ScoreResult {
+export interface AnalyzeResult {
+  bucket: Bucket;
+  /** 0–100 suitability score, clamped into the bucket's display band. */
+  score: number;
   narrative: ClaudeNarrative;
   /** Whether the narrative came from Claude or the deterministic fallback. */
   narrativeSource: "claude" | "fallback";
-  /** True when a photo was analyzed (vs. quiz-only path). */
+  /** True when a photo was analyzed. */
   usedPhoto: boolean;
-  /** True when a dense beard hides the jawline/under-chin/neck from the photo read. */
+  /** True when a dense beard hides the perioral/lower-cheek skin from the read. */
   lowerFaceObscured: boolean;
-  /** Indicative per-region enhancement potential (0–100), keyed by RegionKey. */
-  areaEnhancements: Record<string, number>;
-  /** False when the photo doesn't clearly show the lower face/neck — prompt a retake. */
+  /** The visible skin concerns, each tied to a face region. */
+  skinConcerns: SkinConcern[];
+  /** The standout concern, or null when none was identified. */
+  primaryConcern: ConcernKey | null;
+  /** False when the photo doesn't clearly show the face — prompt a retake. */
   framingAdequate: boolean;
 }
 
@@ -111,11 +81,11 @@ export interface PhotoAssessment {
   /** Claude's 0–100 suitability score for this face; clamped to the bucket band. */
   score: number;
   narrative: ClaudeNarrative;
-  /** True when a dense beard hides the jawline/under-chin/neck from the photo read. */
+  /** True when a dense beard hides the perioral/lower-cheek skin from the read. */
   lowerFaceObscured: boolean;
-  /** Indicative per-region enhancement potential (0–100), keyed by RegionKey. */
-  areaEnhancements: Record<string, number>;
-  /** False when the photo doesn't clearly show the lower face/neck — prompt a retake. */
+  skinConcerns: SkinConcern[];
+  primaryConcern: ConcernKey | null;
+  /** False when the photo doesn't clearly show the face — prompt a retake. */
   framingAdequate: boolean;
 }
 

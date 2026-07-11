@@ -5,6 +5,8 @@ import { BUCKET_META } from "./constants";
 // Pure builder for the GoHighLevel inbound-webhook payload. No network here —
 // the route owns delivery/retry. Marketing consent is carried as its own field,
 // deliberately separate from the lead's intent to see their result (PECR).
+// The `lasermd-voucher-eligible` tag lets the GHL voucher automation fire when
+// an in-clinic appointment is booked; the concern tag drives follow-up routing.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface GhlPayload {
@@ -18,7 +20,8 @@ export interface GhlPayload {
   suitabilityBucket: string;
   suitabilityLabel: string;
   suitabilityScore: number;
-  hardFlags: string[];
+  primaryConcern: string | null;
+  concerns: string[];
   observedAreas: string[];
   usedPhoto: boolean;
   narrativeSource: string;
@@ -32,18 +35,27 @@ export function buildGhlPayload(
   result: AnalyzeResult,
   submittedAt?: string,
 ): GhlPayload {
+  const concerns = [...new Set(result.skinConcerns.map((c) => c.concern))];
   return {
     firstName: lead.firstName,
     lastName: lead.lastName,
     name: `${lead.firstName} ${lead.lastName}`.trim(),
     email: lead.email,
     phone: lead.phone,
-    source: "Endolift Suitability Analyzer",
-    tags: ["endolift-analyzer", `endolift-${result.bucket}`],
+    source: "LaserMD Suitability Analyzer",
+    tags: [
+      "lasermd-analyzer",
+      `lasermd-${result.bucket}`,
+      "lasermd-voucher-eligible",
+      ...(result.primaryConcern
+        ? [`lasermd-concern-${result.primaryConcern}`]
+        : []),
+    ],
     suitabilityBucket: result.bucket,
     suitabilityLabel: BUCKET_META[result.bucket].label,
     suitabilityScore: result.score,
-    hardFlags: result.hardFlags,
+    primaryConcern: result.primaryConcern,
+    concerns,
     observedAreas: result.narrative.observedAreas,
     usedPhoto: result.usedPhoto,
     narrativeSource: result.narrativeSource,

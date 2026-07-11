@@ -3,10 +3,10 @@ import Link from "next/link";
 import {
   BadgeCheck,
   CalendarHeart,
+  Gift,
   ScanFace,
   ShieldCheck,
   Stethoscope,
-  HeartHandshake,
 } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { ClinicFooter } from "@/components/brand/ClinicFooter";
@@ -15,15 +15,15 @@ import { Button } from "@/components/ui/button";
 import { ResultsGallery } from "@/components/result/ResultsGallery";
 import { Testimonials } from "@/components/result/Testimonials";
 import { OfferHero } from "@/components/offer/OfferHero";
-import { FinanceCalculator } from "@/components/offer/FinanceCalculator";
 import { BookingCalendar } from "@/components/offer/BookingCalendar";
 import { InstagramReel } from "@/components/offer/InstagramReel";
-import { CLINIC, OFFER } from "@/lib/constants";
+import { CLINIC, PRICE_GUIDE, VOUCHER } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Endolift from £1,450 · Book your free consultation · MEDfacials",
+  title:
+    "LaseMD Ultra from £149 · £100 welcome voucher · MEDfacials Truro",
   description:
-    "Limited-time Endolift offer at MEDfacials, Truro — from £1,450 (usually from £2,000). Doctor-led, CQC registered. Book your free online consultation.",
+    "LaseMD Ultra laser skin rejuvenation at MEDfacials, Truro — sessions from £149, plus a £100 welcome voucher when you attend your free in-clinic consultation. Doctor-led, CQC registered.",
   // Ad retargeting landing page — keep it out of search results.
   robots: { index: false, follow: false },
 };
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
 const TRUST_CARDS = [
   {
     icon: BadgeCheck,
-    title: "Cornwall's only certified Endolift® provider",
-    copy: "MEDfacials is listed on the official UK Endolift practitioner registry — your treatment is the genuine article.",
+    title: "Genuine Lutronic LaseMD Ultra™",
+    copy: "The new-generation thulium fractional laser — patented ampoules, gentle resurfacing, and results visible from the first session.",
   },
   {
     icon: Stethoscope,
     title: "Doctor-led, always",
-    copy: `Your Endolift is delivered by ${CLINIC.director}, GP and aesthetic doctor, at our ${CLINIC.addressLines[1].split(",")[0]} clinic.`,
+    copy: `Your treatment plan is built by ${CLINIC.director}, GP and aesthetic doctor, at our ${CLINIC.addressLines[1].split(",")[0]} clinic.`,
   },
   {
     icon: ShieldCheck,
@@ -47,9 +47,28 @@ const TRUST_CARDS = [
     copy: "Independently assessed against national standards for safety, hygiene and patient care.",
   },
   {
-    icon: HeartHandshake,
-    title: "Free, no-pressure consultation",
-    copy: "A relaxed online chat to confirm suitability and your exact plan — you decide in your own time.",
+    icon: Gift,
+    title: `${VOUCHER.amount} welcome voucher`,
+    copy: "Attend your free in-clinic consultation and a £100 voucher is yours — redeemable against your LaseMD Ultra treatment plan.",
+  },
+] as const;
+
+const PACKAGES = [
+  {
+    name: "Single session",
+    price: "from £149",
+    copy: "A 20-minute glow reset — brightness and clarity from the very first treatment.",
+  },
+  {
+    name: "Course of 3",
+    price: "save 10%",
+    copy: "The sweet spot for visible tone and texture change, spaced a few weeks apart.",
+    featured: true,
+  },
+  {
+    name: "Course of 5",
+    price: "save 20%",
+    copy: "The full transformation protocol for deeper pigmentation, texture and lines.",
   },
 ] as const;
 
@@ -124,35 +143,47 @@ export default function OfferPage() {
           </div>
         </section>
 
-        {/* Offer recap + finance */}
-        <section id="finance" className="px-6 py-14">
-          <div className="mx-auto grid max-w-5xl items-center gap-8 lg:grid-cols-2">
-            <div>
-              <p className="inline-flex rounded-full border border-peach/40 bg-peach-light/40 px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.18em] text-peach-deep">
-                Limited-time offer
-              </p>
-              <h2 className="mt-4 font-serif text-3xl leading-snug text-heading">
-                Endolift from £1,450
-                <span className="block text-xl text-body/70">
-                  usually from{" "}
-                  <span className="line-through decoration-peach-deep/60 decoration-2">
-                    £2,000
-                  </span>
-                </span>
-              </h2>
-              <p className="mt-4 max-w-md text-sm leading-relaxed text-body">
-                One session, walk-in walk-out, minimal downtime — and with
-                Payl8r finance you can spread the cost into comfortable monthly
-                payments. Your exact price is confirmed at your free
-                consultation.
-              </p>
-              <a href="#book" className="mt-6 inline-block">
+        {/* Packages */}
+        <section id="packages" className="px-6 py-14">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="text-center font-serif text-3xl leading-snug text-heading">
+              LaseMD Ultra sessions from{" "}
+              <span className="text-peach-deep">{PRICE_GUIDE.from}</span>
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-center text-sm leading-relaxed text-body">
+              Tailored packages up to {PRICE_GUIDE.to}. Your exact protocol —
+              and how your {VOUCHER.amount} welcome voucher applies — is
+              confirmed at your free consultation.
+            </p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              {PACKAGES.map((p) => (
+                <div
+                  key={p.name}
+                  className={
+                    "featured" in p && p.featured
+                      ? "rounded-2xl border-2 border-peach/60 bg-peach-light/20 p-6 text-center shadow-glow"
+                      : "rounded-2xl border border-sage/20 bg-white/70 p-6 text-center shadow-soft"
+                  }
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-sage-deep">
+                    {p.name}
+                  </p>
+                  <p className="mt-2 font-serif text-2xl text-heading">
+                    {p.price}
+                  </p>
+                  <p className="mt-2 text-[13px] leading-relaxed text-body">
+                    {p.copy}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8 text-center">
+              <a href="#book" className="inline-block">
                 <Button size="lg">
-                  <CalendarHeart size={18} /> Claim your consultation
+                  <CalendarHeart size={18} /> Claim your consultation & voucher
                 </Button>
               </a>
             </div>
-            <FinanceCalculator />
           </div>
         </section>
 
@@ -160,12 +191,12 @@ export default function OfferPage() {
         <section id="book" className="scroll-mt-20 px-6 py-14">
           <div className="mx-auto max-w-3xl">
             <h2 className="text-center font-serif text-2xl text-heading">
-              Pick a time for your free online consultation
+              Pick a time for your free in-clinic consultation
             </h2>
             <p className="mx-auto mt-2 max-w-lg text-center text-sm text-body/80">
-              15 minutes, from your sofa. Dr Stolte&apos;s team will confirm
-              your suitability, answer your questions and lock in your{" "}
-              offer price.
+              At our Lemon Street clinic in Truro. Dr Stolte&apos;s team will
+              assess your skin, build your personal plan — and your{" "}
+              {VOUCHER.amount} welcome voucher is yours for attending.
             </p>
             <div className="mt-7">
               <BookingCalendar />
@@ -178,16 +209,16 @@ export default function OfferPage() {
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 rounded-2xl border border-sage/25 bg-sage/10 px-6 py-8 text-center">
             <ScanFace size={26} className="text-sage-deep" />
             <h2 className="font-serif text-xl text-heading">
-              Not sure Endolift is right for you?
+              Not sure LaseMD Ultra is right for you?
             </h2>
             <p className="max-w-md text-sm leading-relaxed text-body">
-              Take the free 60-second AI suitability scan (again, if you like)
-              — a selfie and a few questions, and you&apos;ll get a personal
-              suitability guide before you book.
+              Take the free 60-second AI skin scan (again, if you like) — one
+              selfie, and you&apos;ll get a personal suitability report before
+              you book.
             </p>
             <Link href="/">
               <Button variant="sage" size="md">
-                <ScanFace size={16} /> Take the AI scan
+                <ScanFace size={16} /> Take the AI skin scan
               </Button>
             </Link>
           </div>

@@ -49,11 +49,16 @@ export interface ReportInput {
   encouragement: string;
   usedPhoto: boolean;
   lowerFaceObscured: boolean;
+  /** Copy for the "beard noticed" panel (shown when lowerFaceObscured). */
+  beardNote?: string;
   faceImageDataUrl?: string | null;
   faceImageAspect?: number; // width / height — preserved so the photo isn't stretched
   areas: ReportArea[];
   priceFrom: string;
   priceNote: string;
+  /** Optional welcome-voucher panel rendered above the booking CTA. */
+  voucherTitle?: string;
+  voucherText?: string;
   disclaimer: string;
 }
 
@@ -274,7 +279,8 @@ export function buildReportPdf(input: ReportInput): Blob {
     doc.setFontSize(8);
     doc.setTextColor(...P.body);
     const bn = doc.splitTextToSize(
-      `A fuller beard hides the jawline, under-chin and neck, so those reads were kept light. ${T} works just as well under a beard — confirmed precisely in person.`,
+      input.beardNote ??
+        `A fuller beard hides some of the lower-face skin, so those reads were kept light. ${T} works just as well there — confirmed precisely in person.`,
       CW - 22,
     );
     doc.text(bn, M + 11, y + 11);
@@ -368,7 +374,7 @@ export function buildReportPdf(input: ReportInput): Blob {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(7);
         doc.setTextColor(...P.faint);
-        doc.text("ENHANCEMENT POTENTIAL", tx, by, { charSpace: 0.5 });
+        doc.text("IMPROVEMENT POTENTIAL", tx, by, { charSpace: 0.5 });
         doc.setTextColor(...P.goldLt);
         doc.text(`+${pct}%`, PW - M, by, { align: "right" });
         by += 1.6;
@@ -390,16 +396,34 @@ export function buildReportPdf(input: ReportInput): Blob {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9.5);
   doc.setTextColor(...P.body);
-  doc.text(`${T} from `, M, y);
+  doc.text(`${T} sessions from `, M, y);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...P.heading);
-  doc.text(input.priceFrom, M + doc.getTextWidth(`${T} from `), y);
+  doc.text(input.priceFrom, M + doc.getTextWidth(`${T} sessions from `), y);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(...P.faint);
   const pn = doc.splitTextToSize(input.priceNote, CW);
   doc.text(pn, M, y + 5);
   y += 5 + pn.length * 4 + 6;
+
+  if (input.voucherTitle && input.voucherText) {
+    ensure(22);
+    doc.setFillColor(...P.panel);
+    doc.setDrawColor(...P.goldLt);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(M, y, CW, 19, 2.5, 2.5, "FD");
+    doc.setFont("times", "normal");
+    doc.setFontSize(14);
+    doc.setTextColor(...P.gold);
+    doc.text(input.voucherTitle, M + 7, y + 8);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(...P.body);
+    const vt = doc.splitTextToSize(input.voucherText, CW - 14);
+    doc.text(vt, M + 7, y + 13.5);
+    y += 22;
+  }
 
   ensure(20);
   doc.setFillColor(...P.panel);
@@ -409,7 +433,7 @@ export function buildReportPdf(input: ReportInput): Blob {
   doc.setFont("times", "normal");
   doc.setFontSize(13);
   doc.setTextColor(...P.goldLt);
-  doc.text("Book your free consultation", M + 7, y + 7.5);
+  doc.text("Book your free in-clinic consultation", M + 7, y + 7.5);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
   doc.setTextColor(...P.body);

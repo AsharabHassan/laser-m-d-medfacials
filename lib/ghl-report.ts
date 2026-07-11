@@ -77,10 +77,10 @@ export async function deliverReportToGhl(
     const fileUrl = upj.url;
 
     // 2 ── upsert the contact (deduped by email) → contactId, and write the report
-    // URL into the custom field so the LiveKit meeting app reads it as structured
-    // data. Field key is the bare GHL key (no "contact." prefix) via env override.
+    // URL into the custom field so downstream GHL automations read it as
+    // structured data. Field key is the bare GHL key (no "contact." prefix).
     const fieldKey = (
-      process.env.GHL_REPORT_FIELD_KEY || "facial_app_report_pdf"
+      process.env.GHL_REPORT_FIELD_KEY || "lasermd_report_pdf"
     ).trim();
     const upsertBody: Record<string, unknown> = {
       locationId: c.locationId,

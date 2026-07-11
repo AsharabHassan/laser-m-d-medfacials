@@ -73,7 +73,7 @@ export function BeforeAfterSlider({
         {/* AFTER — base layer (full width) */}
         <img
           src={afterSrc}
-          alt={`${area} after Endolift at MEDfacials`}
+          alt={`${area} after LaseMD Ultra at MEDfacials`}
           draggable={false}
           loading="lazy"
           className="absolute inset-0 h-full w-full object-contain"
@@ -86,7 +86,7 @@ export function BeforeAfterSlider({
         >
           <img
             src={beforeSrc}
-            alt={`${area} before Endolift at MEDfacials`}
+            alt={`${area} before LaseMD Ultra at MEDfacials`}
             draggable={false}
             loading="lazy"
             className="absolute inset-0 h-full w-full object-contain"
@@ -104,7 +104,7 @@ export function BeforeAfterSlider({
         {/* Handle */}
         <div
           role="slider"
-          aria-label={`Reveal Endolift result for ${area}`}
+          aria-label={`Reveal LaseMD Ultra result for ${area}`}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(pos)}

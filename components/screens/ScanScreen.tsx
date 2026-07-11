@@ -11,10 +11,11 @@ import { FaceMeshOverlay } from "@/components/scan/FaceMeshOverlay";
 import { requestAnalysis } from "@/lib/api-client";
 
 const STATUS = [
-  "Mapping facial structure",
-  "Assessing lower-face contour",
-  "Reviewing jawline & skin",
-  "Preparing your personalised guide",
+  "Mapping your skin zones",
+  "Reading tone and texture",
+  "Analysing pigmentation and sun exposure",
+  "Measuring radiance",
+  "Composing your personalised results",
 ];
 
 export function ScanScreen() {
@@ -103,7 +104,7 @@ export function ScanScreen() {
         Analysing
       </p>
       <h2 className="mt-3 text-center font-serif text-[28px] leading-tight text-heading sm:text-[34px]">
-        Reading your features
+        Reading your skin
       </h2>
 
       <div className="relative mt-8 aspect-[4/5] w-full max-w-xs overflow-hidden rounded-[2rem] border border-sage/30 bg-heading/10 shadow-soft">

@@ -18,25 +18,30 @@ export const CLINIC = {
 } as const;
 
 export const TRUST_MARKERS = [
-  "Cornwall's only certified Endolift® provider",
+  "Lutronic LaseMD Ultra™",
   "Save Face accredited",
   "CQC registered",
   "Doctor-led",
 ] as const;
 
-/** Booking + site URLs (overridable via public env at deploy). Every booking
- *  CTA (result screen, report email, PDF footer) goes to the GoHighLevel
- *  Endolift consultation calendar. */
+/** Booking + site URLs (overridable via public env at deploy).
+ *  BOOKING_URL is the PRIMARY conversion — the free in-clinic consultation at
+ *  Lemon Street (books the £100 voucher automation in GHL).
+ *  VIRTUAL_BOOKING_URL is the fallback — a free virtual video consultation. */
 export const BOOKING_URL =
   process.env.NEXT_PUBLIC_BOOKING_URL ??
-  "https://links.medfacials.com/widget/bookings/endolift-free-online-consultation";
+  "https://links.medfacials.com/widget/bookings/lasermd-free-in-clinic-consultation";
+
+export const VIRTUAL_BOOKING_URL =
+  process.env.NEXT_PUBLIC_VIRTUAL_BOOKING_URL ??
+  "https://links.medfacials.com/widget/bookings/lasermd-free-virtual-consultation";
 
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://endolift.medfacials.com";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://lasermd.medfacials.com";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Per-bucket presentation metadata. The scoring engine chooses the bucket; this
-// drives the result screen's headline, tone colour, gauge band and CTA.
+// Per-bucket presentation metadata. Claude chooses the bucket; this drives the
+// result screen's headline, tone colour, gauge band and CTA.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface BucketMeta {
@@ -53,86 +58,90 @@ export interface BucketMeta {
 }
 
 export const BUCKET_META: Record<Bucket, BucketMeta> = {
+  excellent: {
+    label: "Excellent candidate",
+    headline: "LaseMD Ultra looks like an excellent fit for you",
+    blurb:
+      "Your skin shows exactly the kind of concerns LaseMD Ultra treats beautifully — this is where it shines.",
+    accent: "peach",
+    ctaLabel: "Book your free in-clinic consultation",
+    gaugeBand: [86, 100],
+  },
   great: {
     label: "Strong candidate",
-    headline: "Endolift looks like a strong fit for you",
+    headline: "LaseMD Ultra looks like a strong fit for you",
     blurb:
-      "Your answers point to exactly the kind of early-to-moderate firmness Endolift addresses beautifully.",
+      "Your skin shows the kind of tone and texture changes LaseMD Ultra addresses beautifully.",
     accent: "peach",
-    ctaLabel: "Book your free consultation",
-    gaugeBand: [82, 100],
+    ctaLabel: "Book your free in-clinic consultation",
+    gaugeBand: [76, 92],
   },
   good: {
     label: "Good candidate",
-    headline: "Endolift could work well for you",
+    headline: "LaseMD Ultra could work well for you",
     blurb:
-      "You show many of the signs that respond well to Endolift — a consultation will confirm the detail.",
+      "Your skin is a good match — from refining texture to protecting the glow you already have.",
     accent: "peach",
-    ctaLabel: "Book your free consultation",
-    gaugeBand: [68, 88],
+    ctaLabel: "Book your free in-clinic consultation",
+    gaugeBand: [67, 85],
   },
   consultation: {
-    label: "Consultation recommended",
-    headline: "Endolift may help — let's confirm in person",
+    label: "Personalised protocol",
+    headline: "Let's build your personalised protocol",
     blurb:
-      "A few of your answers are best reviewed by Dr Stolte's team before we can be sure. That's completely normal.",
+      "Your consultation will confirm your personalised protocol — that's completely normal, and it's free.",
     accent: "sage",
-    ctaLabel: "Book your free consultation",
-    gaugeBand: [55, 75],
-  },
-  alternative: {
-    label: "Let's explore your options",
-    headline: "Another treatment may suit you better",
-    blurb:
-      "Your goals may be better met by a different approach. A free consultation is the best way to find the right one.",
-    accent: "sage",
-    ctaLabel: "Discuss your options",
-    gaugeBand: [40, 60],
+    ctaLabel: "Book your free in-clinic consultation",
+    gaugeBand: [60, 78],
   },
 };
 
-/** Friendly labels for the areas a respondent can select. */
-export const AREA_LABELS: Record<string, string> = {
-  jawline: "jawline & jowls",
-  chin: "under-chin",
-  neck: "neck",
-  cheeks: "mid-face & cheeks",
-  undereye: "under-eye area",
-  body: "body area",
-};
-
-/** Areas Endolift targets, for the result screen's "what it treats" context. */
-export const ENDOLIFT_AREAS = [
-  "Jawline & jowls",
-  "Under-chin / double chin",
-  "Neck",
-  "Mid-face & cheeks",
+/** Skin concerns LaseMD Ultra treats, for the result screen's context. */
+export const LASERMD_CONCERNS = [
+  "Pigmentation & sun damage",
+  "Redness & uneven tone",
+  "Texture & enlarged pores",
+  "Fine lines",
+  "Dullness & radiance",
 ] as const;
 
 /** Indicative UK pricing guidance (clinic-stated ranges). */
 export const PRICE_GUIDE = {
-  from: "£1,450",
+  from: "£149",
+  to: "£499",
+  courses: "Courses of 3 (save 10%) · Courses of 5 (save 20%)",
   note: "Indicative — your exact plan is confirmed at consultation.",
 } as const;
 
+/** The welcome voucher promised on in-clinic consultation bookings. The voucher
+ *  email itself is sent by a GHL automation after the appointment is booked —
+ *  the app only makes the promise. */
+export const VOUCHER = {
+  amount: "£100",
+  title: "£100 Welcome Voucher",
+  promise:
+    "Yours when you attend your free in-clinic consultation at Lemon Street — redeem against your LaseMD Ultra treatment plan.",
+  urgency: "Consultation places at our Truro clinic are limited each month.",
+} as const;
+
 // ─────────────────────────────────────────────────────────────────────────────
-// Retargeting offer page (/offer): promotional pricing, the embedded
-// GoHighLevel booking calendar, social proof and Payl8r finance links.
+// Retargeting offer page (/offer): package pricing, the embedded GoHighLevel
+// booking calendar and social proof.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const OFFER = {
-  /** Promotional "from" price in GBP (numeric, used by the finance calculator). */
-  price: 1450,
-  /** Usual "from" price shown struck through next to the offer. */
-  usualPrice: 2000,
+  /** Single-session "from" price in GBP. */
+  price: 149,
+  /** Headline single-session price for the flagship package. */
+  topPrice: 499,
   /** GoHighLevel booking calendar embedded on the offer page (defaults to the
-   *  same calendar every other booking CTA uses). */
+   *  same in-clinic calendar every other booking CTA uses). */
   calendarUrl: process.env.NEXT_PUBLIC_OFFER_CALENDAR_URL ?? BOOKING_URL,
-  /** Instagram reel — a MEDfacials patient's Endolift testimonial. */
+  /** Instagram reel — a MEDfacials patient testimonial. */
   instagramReelUrl: "https://www.instagram.com/reel/DJUhCJEMtsw/",
-  /** Clinic finance page (Payl8r calculator on medfacials.com). */
+  /** Clinic finance page (Payl8r on medfacials.com). */
   financeUrl: "https://medfacials.com/easy-finance/",
 } as const;
 
 export const DISCLAIMER =
-  "This tool offers general information to help you prepare for a consultation. It is not a medical assessment or diagnosis. Suitability for Endolift is confirmed in person by a qualified practitioner.";
+  "This tool offers general information to help you prepare for a consultation. It is not a medical assessment or diagnosis. Suitability for LaseMD Ultra is confirmed in person by a qualified practitioner.";

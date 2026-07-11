@@ -5,8 +5,9 @@ import { Sparkles } from "lucide-react";
 import { BeforeAfterSlider } from "./BeforeAfterSlider";
 import { EASE } from "@/lib/motion";
 
-// Real, consented MEDfacials Endolift before/after pairs. Faces are cropped to
-// the treatment area only. Replace or extend this list as new cases are approved.
+// Consented MEDfacials before/after pairs. PLACEHOLDER: these are the clinic's
+// existing case photos — swap in real LaseMD Ultra cases as the client approves
+// them (same filenames in /public/results, or extend this list).
 // Both sliders share one frame size for a balanced grid; each photo is shown
 // fully (object-contain) inside that frame, letterboxed where its native ratio
 // differs from the frame.
@@ -14,12 +15,12 @@ const FRAME_RATIO = "4 / 3";
 
 const CASES = [
   {
-    area: "jawline and neck",
+    area: "skin tone and texture",
     before: "/results/neck-before.jpg",
     after: "/results/neck-after.jpg",
   },
   {
-    area: "under-eye",
+    area: "under-eye brightness",
     before: "/results/eyes-before.jpg",
     after: "/results/eyes-after.jpg",
   },
@@ -33,8 +34,8 @@ export function ResultsGallery() {
         <h3 className="font-serif text-xl text-heading">Real results, real patients</h3>
       </div>
       <p className="mx-auto mt-1 max-w-md text-center text-[13px] leading-relaxed text-body/80">
-        Actual Endolift results from Dr Stolte&apos;s team in Truro. Individual
-        results vary — yours is confirmed at your consultation.
+        Actual results from Dr Stolte&apos;s team in Truro. Individual results
+        vary — yours is confirmed at your consultation.
       </p>
 
       <div className="mt-5 grid gap-5 sm:grid-cols-2">

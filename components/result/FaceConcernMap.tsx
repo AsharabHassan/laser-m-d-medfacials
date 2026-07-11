@@ -7,55 +7,57 @@ import { useWizard } from "@/store/wizard-store";
 import {
   regionMarkers,
   regionRect,
-  toRegionKey,
   faceVisibleSide,
+  CONCERN_COPY,
+  CONCERN_LABEL,
   REGION_COPY,
   REGION_LABEL,
   REGION_ORDER,
   type NormEllipse,
   type RegionKey,
 } from "@/lib/face-regions";
+import type { SkinConcern } from "@/lib/types";
 import { cropImage } from "@/lib/crop";
 import { useLightFx } from "@/lib/use-light-fx";
 import { EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-// The core areas Endolift addresses — always shown when the face is readable.
-// Neck is added only if Claude flagged it, so the map stays focused.
-const CORE: RegionKey[] = ["undereye", "cheeks", "jawline", "chin"];
+// Regions shown when Claude returned no mappable concerns (fallback path) — the
+// zones LaseMD Ultra treats, so the user still gets a focused, on-device look.
+const DEFAULT_REGIONS: RegionKey[] = ["forehead", "undereye", "cheeks", "nose"];
 
-// Lower-face areas a beard hides — when the read is beard-obscured these can't be
-// honestly assessed from the photo, so the map says so instead of claiming a read.
-const BEARD_COVERED: RegionKey[] = ["jawline", "chin", "neck"];
+// The lower-face zone a beard hides — when the read is beard-obscured this can't
+// be honestly assessed from the photo, so the map says so instead of claiming a read.
+const BEARD_COVERED: RegionKey[] = ["perioral"];
 
 interface Mapped {
   region: RegionKey;
   num: number;
   markers: NormEllipse[];
   crop: string | null;
-  flagged: boolean;
+  /** Claude's concerns observed in this region (empty on the fallback path). */
+  concerns: SkinConcern[];
+  covered: boolean;
 }
 
 /**
  * A premium, on-face concern map. Shows the visitor their OWN selfie with the
- * areas Endolift treats marked anatomically (computed on-device from the
- * MediaPipe mesh) — bilateral areas get a marker on each side so they sit on the
- * real feature, not the nose. Each area links to a cropped close-up and a short
- * note on how the treatment helps it. Renders nothing on the no-photo path.
+ * skin zones LaseMD Ultra treats marked anatomically (computed on-device from
+ * the MediaPipe mesh) — bilateral areas get a marker on each side so they sit on
+ * the real feature, not the nose. Each area links to a cropped close-up, the
+ * concern Claude observed there and its improvement potential. Renders nothing
+ * on the no-photo path.
  */
 export function FaceConcernMap() {
   const imageBase64 = useWizard((s) => s.imageBase64);
   const imageMediaType = useWizard((s) => s.imageMediaType);
   const landmarks = useWizard((s) => s.landmarks);
-  const observedAreas = useWizard((s) => s.result?.narrative.observedAreas);
+  const skinConcerns = useWizard((s) => s.result?.skinConcerns);
   const lowerFaceObscured = useWizard((s) => s.result?.lowerFaceObscured);
-  const areaEnhancements = useWizard((s) => s.result?.areaEnhancements);
   const light = useLightFx();
 
-  const isCovered = (r: RegionKey) =>
-    Boolean(lowerFaceObscured) && BEARD_COVERED.includes(r);
   const beardBlurb = (r: RegionKey) =>
-    `Your beard covers this area, so we couldn't read it from your photo. Endolift still works beautifully here beneath a beard — Dr Stolte's team will assess your ${REGION_LABEL[
+    `Your beard covers this area, so we couldn't read it from your photo. LaseMD Ultra still works beautifully here — Dr Stolte's team will assess your ${REGION_LABEL[
       r
     ].toLowerCase()} precisely in person.`;
 
@@ -63,37 +65,49 @@ export function FaceConcernMap() {
     ? `data:${imageMediaType};base64,${imageBase64}`
     : null;
 
-  const flaggedSet = useMemo(
-    () =>
-      new Set(
-        (observedAreas ?? [])
-          .map(toRegionKey)
-          .filter((r): r is RegionKey => r !== null),
-      ),
-    [observedAreas],
-  );
+  // Concerns grouped by region, in anatomical order. Beard-covered regions are
+  // never claimed as read; when obscured, the perioral zone gets a "covered" card.
+  const byRegion = useMemo(() => {
+    const groups = new Map<RegionKey, SkinConcern[]>();
+    for (const c of skinConcerns ?? []) {
+      const region = c.region as RegionKey;
+      if (!REGION_ORDER.includes(region)) continue;
+      if (lowerFaceObscured && BEARD_COVERED.includes(region)) continue;
+      const list = groups.get(region) ?? [];
+      list.push(c);
+      groups.set(region, list);
+    }
+    return groups;
+  }, [skinConcerns, lowerFaceObscured]);
 
   const regions = useMemo(() => {
     if (!landmarks) return [] as RegionKey[];
-    const wanted = [
-      ...CORE,
-      ...(flaggedSet.has("neck") ? ["neck" as const] : []),
-    ];
+    const wanted: RegionKey[] =
+      byRegion.size > 0 ? [...byRegion.keys()] : DEFAULT_REGIONS;
+    const withBeard = lowerFaceObscured
+      ? [...new Set([...wanted, ...BEARD_COVERED])]
+      : wanted;
     return REGION_ORDER.filter(
-      (r) => wanted.includes(r) && regionMarkers(r, landmarks).length > 0,
+      (r) => withBeard.includes(r) && regionMarkers(r, landmarks).length > 0,
     );
-  }, [landmarks, flaggedSet]);
+  }, [landmarks, byRegion, lowerFaceObscured]);
 
   const [mapped, setMapped] = useState<Mapped[]>([]);
   const [active, setActive] = useState<RegionKey | null>(null);
   const cardRefs = useRef<Partial<Record<RegionKey, HTMLDivElement | null>>>({});
 
   useEffect(() => {
-    if (!imageBase64 || !landmarks || regions.length === 0) {
-      setMapped([]);
-      return;
-    }
     let cancelled = false;
+    if (!imageBase64 || !landmarks || regions.length === 0) {
+      // Defer the reset a tick so the effect body never sets state synchronously.
+      const t = setTimeout(() => {
+        if (!cancelled) setMapped([]);
+      }, 0);
+      return () => {
+        cancelled = true;
+        clearTimeout(t);
+      };
+    }
     const vs = faceVisibleSide(landmarks);
     (async () => {
       const out: Mapped[] = [];
@@ -116,7 +130,9 @@ export function FaceConcernMap() {
           num: out.length + 1,
           markers,
           crop,
-          flagged: flaggedSet.has(region),
+          concerns: byRegion.get(region) ?? [],
+          covered:
+            Boolean(lowerFaceObscured) && BEARD_COVERED.includes(region),
         });
       }
       if (!cancelled) setMapped(out);
@@ -124,11 +140,11 @@ export function FaceConcernMap() {
     return () => {
       cancelled = true;
     };
-  }, [imageBase64, imageMediaType, landmarks, regions, flaggedSet]);
+  }, [imageBase64, imageMediaType, landmarks, regions, byRegion, lowerFaceObscured]);
 
   if (!dataUrl || mapped.length === 0) return null;
 
-  const focusCount = mapped.filter((m) => m.flagged).length;
+  const focusCount = mapped.filter((m) => m.concerns.length > 0).length;
   const pins = mapped.flatMap((m) =>
     m.markers.map((e, k) => ({
       key: `${m.region}-${k}`,
@@ -143,14 +159,14 @@ export function FaceConcernMap() {
       <div className="flex items-center justify-center gap-2 text-center">
         <ScanFace size={15} className="text-peach-deep" />
         <h3 className="font-serif text-xl text-heading sm:text-2xl">
-          Your Endolift face map
+          Your personal skin map
         </h3>
       </div>
       <p className="mx-auto mt-1 max-w-md text-center text-[13px] leading-relaxed text-body/80">
         Mapped from your own photo, on your device.
         {focusCount > 0
-          ? " The highlighted areas are where Endolift can make the most difference for you."
-          : " Each marker shows an area Endolift can refine — confirmed at your consultation."}
+          ? " The highlighted areas are where LaseMD Ultra can make the most difference for you."
+          : " Each marker shows a zone LaseMD Ultra can refine — confirmed at your consultation."}
       </p>
 
       {/* ── The map ─────────────────────────────────────────────────────── */}
@@ -164,7 +180,7 @@ export function FaceConcernMap() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={dataUrl}
-            alt="Your photo with the Endolift treatment areas mapped on"
+            alt="Your photo with the LaseMD Ultra treatment zones mapped on"
             className="block h-auto w-full select-none"
             draggable={false}
           />
@@ -183,7 +199,7 @@ export function FaceConcernMap() {
             </defs>
             {pins.map((p, i) => {
               const isActive = active === p.region;
-              const covered = isCovered(p.region);
+              const covered = mapped.find((m) => m.region === p.region)?.covered;
               return (
                 <motion.g
                   key={p.key}
@@ -285,9 +301,23 @@ export function FaceConcernMap() {
       {/* ── Concern detail cards ────────────────────────────────────────── */}
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {mapped.map((m, i) => {
-          const copy = REGION_COPY[m.region];
+          const top = m.concerns[0];
+          const title = m.covered
+            ? REGION_COPY[m.region].title
+            : top
+              ? CONCERN_COPY[top.concern].title
+              : REGION_COPY[m.region].title;
+          const observation = m.concerns.find(
+            (c) => c.observation.trim().length > 0,
+          )?.observation;
+          const blurb = m.covered
+            ? beardBlurb(m.region)
+            : (observation ??
+              (top ? CONCERN_COPY[top.concern].blurb : REGION_COPY[m.region].blurb));
+          const improvement = m.concerns.length
+            ? Math.max(...m.concerns.map((c) => c.improvementPercent))
+            : null;
           const isActive = active === m.region;
-          const covered = isCovered(m.region);
           return (
             <motion.div
               key={m.region}
@@ -329,49 +359,54 @@ export function FaceConcernMap() {
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <p className="font-serif text-[15px] text-heading">
-                    {copy.title}
-                  </p>
-                  {covered ? (
+                  <p className="font-serif text-[15px] text-heading">{title}</p>
+                  {m.covered ? (
                     <span className="inline-flex items-center gap-0.5 rounded-full bg-sage/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-body/80">
                       Under your beard
                     </span>
                   ) : (
-                    m.flagged && (
+                    m.concerns.length > 0 && (
                       <span className="inline-flex items-center gap-0.5 rounded-full bg-peach-light/50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-peach-deep">
-                        <Sparkles size={9} /> Focus
+                        <Sparkles size={9} /> {REGION_LABEL[m.region]}
                       </span>
                     )
                   )}
                 </div>
+                {!m.covered && m.concerns.length > 1 && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {m.concerns.slice(1).map((c) => (
+                      <span
+                        key={c.concern}
+                        className="rounded-full bg-sage/10 px-1.5 py-0.5 text-[9.5px] font-medium text-body/80"
+                      >
+                        {CONCERN_LABEL[c.concern]}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <p className="mt-1 text-[12.5px] leading-relaxed text-body">
-                  {covered ? beardBlurb(m.region) : copy.blurb}
+                  {blurb}
                 </p>
-                {!covered &&
-                  typeof areaEnhancements?.[m.region] === "number" && (
-                    <div className="mt-2.5">
-                      <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.12em]">
-                        <span className="text-body/70">
-                          Enhancement potential
-                        </span>
-                        <span className="text-peach-deep">
-                          ↑ {areaEnhancements[m.region]}%
-                        </span>
-                      </div>
-                      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-sage/20">
-                        <motion.div
-                          className="h-full rounded-full bg-gradient-to-r from-peach-deep via-peach to-peach-light"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${areaEnhancements[m.region]}%` }}
-                          transition={{
-                            duration: 0.9,
-                            ease: EASE,
-                            delay: 0.25 + i * 0.06,
-                          }}
-                        />
-                      </div>
+                {!m.covered && improvement !== null && (
+                  <div className="mt-2.5">
+                    <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.12em]">
+                      <span className="text-body/70">Improvement potential</span>
+                      <span className="text-peach-deep">↑ {improvement}%</span>
                     </div>
-                  )}
+                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-sage/20">
+                      <motion.div
+                        className="h-full rounded-full bg-gradient-to-r from-peach-deep via-peach to-peach-light"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${improvement}%` }}
+                        transition={{
+                          duration: 0.9,
+                          ease: EASE,
+                          delay: 0.25 + i * 0.06,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </motion.div>
           );

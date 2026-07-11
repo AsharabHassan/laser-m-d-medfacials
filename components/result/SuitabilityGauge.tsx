@@ -25,14 +25,14 @@ export function SuitabilityGauge({ score, accent }: SuitabilityGaugeProps) {
   const [display, setDisplay] = useState(reduce ? score : 0);
 
   useEffect(() => {
-    if (reduce) {
-      setDisplay(score);
-      return;
-    }
     let raf = 0;
     const dur = 1400;
     const t0 = performance.now();
     const tick = (t: number) => {
+      if (reduce) {
+        setDisplay(score);
+        return;
+      }
       const p = Math.min(1, (t - t0) / dur);
       const eased = 1 - Math.pow(1 - p, 3);
       setDisplay(Math.round(score * eased));

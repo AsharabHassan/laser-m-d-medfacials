@@ -1,9 +1,6 @@
-import type { QuizAnswers } from "./types";
-
 // ─────────────────────────────────────────────────────────────────────────────
-// Pure readiness gates. `assessFace` turns on-device MediaPipe geometry into a
-// pass/fail + a friendly retake hint. `isQuizComplete` guards quiz submission.
-// Neither touches the DOM or network, so both are fully unit-testable.
+// Pure readiness gate. `assessFace` turns on-device MediaPipe geometry into a
+// pass/fail + a friendly retake hint. No DOM or network — fully unit-testable.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface FaceFrame {
@@ -36,26 +33,4 @@ export function assessFace(frame: FaceFrame): FaceAssessment {
   if (frame.offCenter > MAX_OFFCENTER)
     return { ok: false, hint: "Centre your face in the frame." };
   return { ok: true, hint: "Looking good — hold still." };
-}
-
-/** All ten questions answered (single-choice present, multi-choice non-empty). */
-export function isQuizComplete(
-  answers: Partial<QuizAnswers>,
-): answers is QuizAnswers {
-  const single: (keyof QuizAnswers)[] = [
-    "laxity",
-    "age",
-    "skin",
-    "pregnant",
-    "smoker",
-    "recentTreatment",
-    "expectation",
-    "goodHealth",
-  ];
-  for (const key of single) {
-    if (answers[key] == null) return false;
-  }
-  if (!answers.areas || answers.areas.length === 0) return false;
-  if (!answers.conditions || answers.conditions.length === 0) return false;
-  return true;
 }

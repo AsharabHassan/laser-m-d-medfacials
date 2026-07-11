@@ -1,12 +1,12 @@
 "use client";
 
-import type { AnalyzeResult, Lead } from "./types";
+import type { AnalyzeResult, Lead, SkinConcern } from "./types";
 import type { NormalizedPoint } from "@/components/scan/useFaceLandmarker";
 import {
   regionMarkers,
   regionRect,
   faceVisibleSide,
-  toRegionKey,
+  CONCERN_COPY,
   REGION_ORDER,
   REGION_COPY,
   REGION_LABEL,
@@ -18,13 +18,14 @@ import {
   CLINIC,
   BOOKING_URL,
   PRICE_GUIDE,
+  VOUCHER,
   DISCLAIMER,
 } from "./constants";
 import { buildReportPdf, type ReportArea } from "./report-pdf";
 
 // Mirrors the on-screen FaceConcernMap so the PDF matches what the client saw.
-const CORE: RegionKey[] = ["undereye", "cheeks", "jawline", "chin"];
-const BEARD_COVERED: RegionKey[] = ["jawline", "chin", "neck"];
+const DEFAULT_REGIONS: RegionKey[] = ["forehead", "undereye", "cheeks", "nose"];
+const BEARD_COVERED: RegionKey[] = ["perioral"];
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -36,29 +37,45 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 function beardBlurb(r: RegionKey): string {
-  return `Your beard covers this area, so we couldn't read it from your photo. Endolift still works beautifully here beneath a beard — Dr Stolte's team will assess your ${REGION_LABEL[
+  return `Your beard covers this area, so we couldn't read it from your photo. LaseMD Ultra still works beautifully here — Dr Stolte's team will assess your ${REGION_LABEL[
     r
   ].toLowerCase()} precisely in person.`;
+}
+
+interface PlannedRegion {
+  region: RegionKey;
+  num: number;
+  concerns: SkinConcern[];
+  covered: boolean;
 }
 
 function planRegions(
   landmarks: NormalizedPoint[],
   result: AnalyzeResult,
-): { region: RegionKey; num: number; flagged: boolean; covered: boolean }[] {
-  const flagged = new Set(
-    (result.narrative.observedAreas ?? [])
-      .map(toRegionKey)
-      .filter((r): r is RegionKey => r !== null),
-  );
-  const wanted = [...CORE, ...(flagged.has("neck") ? (["neck"] as const) : [])];
+): PlannedRegion[] {
+  const byRegion = new Map<RegionKey, SkinConcern[]>();
+  for (const c of result.skinConcerns ?? []) {
+    const region = c.region as RegionKey;
+    if (!REGION_ORDER.includes(region)) continue;
+    if (result.lowerFaceObscured && BEARD_COVERED.includes(region)) continue;
+    const list = byRegion.get(region) ?? [];
+    list.push(c);
+    byRegion.set(region, list);
+  }
+  const wanted: RegionKey[] =
+    byRegion.size > 0 ? [...byRegion.keys()] : DEFAULT_REGIONS;
+  const withBeard = result.lowerFaceObscured
+    ? [...new Set([...wanted, ...BEARD_COVERED])]
+    : wanted;
   const regions = REGION_ORDER.filter(
-    (r) => wanted.includes(r) && regionMarkers(r, landmarks).length > 0,
+    (r) => withBeard.includes(r) && regionMarkers(r, landmarks).length > 0,
   );
   return regions.map((region, i) => ({
     region,
     num: i + 1,
-    flagged: flagged.has(region),
-    covered: Boolean(result.lowerFaceObscured) && BEARD_COVERED.includes(region),
+    concerns: byRegion.get(region) ?? [],
+    covered:
+      Boolean(result.lowerFaceObscured) && BEARD_COVERED.includes(region),
   }));
 }
 
@@ -114,8 +131,8 @@ async function renderAnnotatedFace(
 }
 
 /**
- * Build the branded suitability report PDF entirely in the browser. Returns a PDF
- * Blob. Works with or without a photo (quiz-only → verdict-only report).
+ * Build the branded suitability report PDF entirely in the browser. Returns a
+ * PDF Blob. Works with or without a photo (fallback → verdict-only report).
  */
 export async function generateReportPdf(opts: {
   result: AnalyzeResult;
@@ -142,21 +159,35 @@ export async function generateReportPdf(opts: {
     faceImageAspect = face?.aspect;
     const plan = planRegions(landmarks, result);
     areas = await Promise.all(
-      plan.map(async ({ region, num, flagged, covered }) => {
+      plan.map(async ({ region, num, concerns, covered }) => {
         const rect = regionRect(region, landmarks);
         const cropDataUrl = rect
           ? await cropImage(imageBase64, imageMediaType, rect)
           : null;
+        const top = concerns[0];
+        const observation = concerns.find(
+          (c) => c.observation.trim().length > 0,
+        )?.observation;
         return {
           num,
-          title: REGION_COPY[region].title,
-          blurb: covered ? beardBlurb(region) : REGION_COPY[region].blurb,
+          title: covered
+            ? REGION_COPY[region].title
+            : top
+              ? CONCERN_COPY[top.concern].title
+              : REGION_COPY[region].title,
+          blurb: covered
+            ? beardBlurb(region)
+            : (observation ??
+              (top
+                ? CONCERN_COPY[top.concern].blurb
+                : REGION_COPY[region].blurb)),
           cropDataUrl,
           covered,
-          flagged,
-          enhancement: covered
-            ? null
-            : (result.areaEnhancements?.[region] ?? null),
+          flagged: concerns.length > 0,
+          enhancement:
+            covered || concerns.length === 0
+              ? null
+              : Math.max(...concerns.map((c) => c.improvementPercent)),
         } satisfies ReportArea;
       }),
     );
@@ -170,7 +201,7 @@ export async function generateReportPdf(opts: {
 
   return buildReportPdf({
     clinicName: CLINIC.name,
-    treatmentName: "Endolift",
+    treatmentName: "LaseMD Ultra",
     byline: CLINIC.byline,
     palette: {
       bg: [255, 248, 238],
@@ -196,11 +227,15 @@ export async function generateReportPdf(opts: {
     encouragement: result.narrative.encouragement,
     usedPhoto: result.usedPhoto,
     lowerFaceObscured: result.lowerFaceObscured,
+    beardNote:
+      "A fuller beard hides the skin around the mouth and chin, so that read was kept light. LaseMD Ultra works just as well there — confirmed precisely in person.",
     faceImageDataUrl,
     faceImageAspect,
     areas,
     priceFrom: PRICE_GUIDE.from,
-    priceNote: PRICE_GUIDE.note,
+    priceNote: `${PRICE_GUIDE.courses}. ${PRICE_GUIDE.note}`,
+    voucherTitle: VOUCHER.title,
+    voucherText: VOUCHER.promise,
     disclaimer: DISCLAIMER,
   });
 }

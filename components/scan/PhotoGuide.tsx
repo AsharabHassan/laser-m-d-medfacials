@@ -6,8 +6,8 @@ import type { ReactNode } from "react";
 // ─────────────────────────────────────────────────────────────────────────────
 // On-brand, illustrative "how to take your photo" guide. Pure inline SVG line-art
 // (no images to license, no privacy concerns) in the MEDfacials peach/sage
-// palette. A clear front-facing, well-lit, lower-face-visible selfie gives the
-// AI the best read — which keeps suitability results accurate and encouraging.
+// palette. A clear front-facing, well-lit, whole-face selfie gives the AI the
+// best skin read — which keeps suitability results accurate and encouraging.
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface Tip {
@@ -105,7 +105,7 @@ function Covered() {
 const TIPS: Tip[] = [
   { ok: true, label: "Face the camera", art: <FaceOn /> },
   { ok: true, label: "Good, even light", art: <GoodLight /> },
-  { ok: true, label: "Jaw & chin clear", art: <ChinClear /> },
+  { ok: true, label: "Whole face in frame", art: <ChinClear /> },
   { ok: false, label: "No side angles", art: <SideAngle /> },
   { ok: false, label: "Not too dark", art: <TooDark /> },
   { ok: false, label: "Don't cover it", art: <Covered /> },

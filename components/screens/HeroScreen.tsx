@@ -21,14 +21,13 @@ export function HeroScreen() {
         transition={{ duration: 0.8, ease: EASE, delay: 0.15 }}
         className="relative z-10 inline-flex items-center gap-2 rounded-full border border-white/50 bg-white/40 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-peach-deep shadow-[0_8px_30px_-12px_rgba(227,148,107,0.5)] backdrop-blur-md"
       >
-        <Sparkles size={13} /> AI Endolift suitability
+        <Sparkles size={13} /> AI skin analysis
       </motion.span>
 
       <h1 className="relative z-10 mt-8 font-serif text-[46px] leading-[1.02] tracking-tight text-heading sm:text-[68px]">
-        <Line delay={0.35}>Discover if Endolift</Line>
+        <Line delay={0.35}>Reveal your skin&rsquo;s</Line>
         <Line delay={0.5}>
-          is right for{" "}
-          <span className="italic text-peach-deep">you</span>
+          natural <span className="italic text-peach-deep">brilliance</span>
         </Line>
       </h1>
 
@@ -38,9 +37,9 @@ export function HeroScreen() {
         transition={{ duration: 0.9, ease: EASE, delay: 0.85 }}
         className="relative z-10 mt-7 max-w-md text-lg leading-relaxed text-body"
       >
-        Take a photo and our AI reads your lower face in seconds — a doctor-led
-        guide to Cornwall&rsquo;s certified non-surgical skin-tightening. No
-        pressure, just clarity.
+        Take a 30-second AI skin scan and discover what LaseMD Ultra&trade;
+        could do for your skin — with a personalised report, and a £100 welcome
+        voucher when you book your free in-clinic consultation.
       </motion.p>
 
       <motion.div
@@ -50,11 +49,11 @@ export function HeroScreen() {
         className="relative z-10 mt-10 flex flex-col items-center gap-5"
       >
         <Button size="lg" onClick={start} className="px-10">
-          Begin your analysis
+          Start my skin scan
           <ArrowRight size={18} />
         </Button>
         <div className="flex items-center gap-3 text-[13px] font-medium text-heading/55">
-          <span>60 seconds</span>
+          <span>30 seconds</span>
           <Dot />
           <span>Private</span>
           <Dot />

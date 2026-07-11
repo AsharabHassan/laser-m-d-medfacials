@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { CalendarHeart, ScanFace, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TrustMarkers } from "@/components/brand/TrustMarkers";
-import { OFFER, CLINIC } from "@/lib/constants";
+import { OFFER, CLINIC, VOUCHER } from "@/lib/constants";
 import { EASE } from "@/lib/motion";
 
 const gbp = new Intl.NumberFormat("en-GB", {
@@ -15,9 +15,9 @@ const gbp = new Intl.NumberFormat("en-GB", {
 });
 
 /**
- * Retargeting hero: leads with the promotional price (offer vs usual), then
- * drives to the on-page booking calendar (#book) with the AI scan as the
- * secondary path for visitors who want to re-check suitability first.
+ * Retargeting hero: leads with the welcome voucher + entry price, then drives
+ * to the on-page booking calendar (#book) with the AI scan as the secondary
+ * path for visitors who want to re-check suitability first.
  */
 export function OfferHero() {
   return (
@@ -29,7 +29,7 @@ export function OfferHero() {
           transition={{ duration: 0.5, ease: EASE }}
           className="inline-flex items-center gap-2 rounded-full border border-peach/40 bg-peach-light/40 px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.18em] text-peach-deep"
         >
-          <Sparkles size={13} /> Limited-time Endolift offer
+          <Sparkles size={13} /> {VOUCHER.amount} welcome voucher
         </motion.p>
 
         <motion.h1
@@ -38,8 +38,8 @@ export function OfferHero() {
           transition={{ delay: 0.08, duration: 0.6, ease: EASE }}
           className="mt-5 text-4xl leading-tight sm:text-5xl"
         >
-          Endolift from{" "}
-          <span className="text-peach-deep">{gbp.format(OFFER.price)}</span>
+          Time waits for no one, but your skin can look{" "}
+          <span className="text-peach-deep">timeless</span>
         </motion.h1>
 
         <motion.p
@@ -48,11 +48,11 @@ export function OfferHero() {
           transition={{ delay: 0.16, duration: 0.6, ease: EASE }}
           className="mt-3 text-lg text-body"
         >
-          Usually from{" "}
-          <span className="text-body/70 line-through decoration-peach-deep/60 decoration-2">
-            {gbp.format(OFFER.usualPrice)}
+          LaseMD Ultra sessions from{" "}
+          <span className="font-semibold text-peach-deep">
+            {gbp.format(OFFER.price)}
           </span>{" "}
-          — one treatment, no scalpel, results that keep improving for months.
+          — 20 minutes, minimal downtime, glow from the first session.
         </motion.p>
 
         <motion.p
@@ -61,10 +61,10 @@ export function OfferHero() {
           transition={{ delay: 0.24, duration: 0.6, ease: EASE }}
           className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-body/80"
         >
-          You recently checked your Endolift suitability with {CLINIC.name}.
-          Your free online consultation with Dr Stolte&apos;s team is the next
-          step — pick a time below and we&apos;ll confirm your personal plan and
-          exact price.
+          You recently checked your LaseMD Ultra suitability with {CLINIC.name}.
+          Book your free in-clinic consultation at Lemon Street below — attend
+          and a {VOUCHER.amount} welcome voucher is yours to redeem against your
+          treatment plan.
         </motion.p>
 
         <motion.div
@@ -80,7 +80,7 @@ export function OfferHero() {
           </a>
           <Link href="/" className="w-full sm:w-auto">
             <Button variant="outline" size="lg" className="w-full sm:w-auto">
-              <ScanFace size={18} /> Take the AI scan
+              <ScanFace size={18} /> Take the AI skin scan
             </Button>
           </Link>
         </motion.div>

@@ -1,5 +1,5 @@
 import { deliverReportToGhl } from "@/lib/ghl-report";
-import { CLINIC, BOOKING_URL } from "@/lib/constants";
+import { CLINIC, BOOKING_URL, VIRTUAL_BOOKING_URL, VOUCHER } from "@/lib/constants";
 
 export const runtime = "nodejs";
 
@@ -37,23 +37,26 @@ export async function POST(request: Request): Promise<Response> {
   const score = Number.isFinite(body.score) ? body.score : undefined;
 
   const safeName = (first || "client").replace(/[^\w-]/g, "");
-  const fileName = `Endolift-Report-${safeName}.pdf`;
-  const subject = `${first || "Your"} Endolift suitability report`;
+  const fileName = `LaserMD-Report-${safeName}.pdf`;
+  const subject = `${first ? `${first}, your` : "Your"} LaseMD Ultra skin analysis report`;
 
   const emailHtml = `
     <div style="font-family:Helvetica,Arial,sans-serif;color:#484c4c;line-height:1.6">
       <p>Hi ${first || "there"},</p>
-      <p>Thank you for taking the Endolift suitability analysis at
+      <p>Thank you for taking the LaseMD Ultra skin analysis at
       <strong>${CLINIC.name}</strong> ${CLINIC.byline}. Your personalised report is
       attached as a PDF.</p>
       <p>It's a guide to help you prepare — your suitability is always confirmed in
-      person. When you're ready, book your free, no-pressure consultation and we'll
-      talk you through everything.</p>
-      <p><a href="${BOOKING_URL}" style="color:#c97c4a">Book your free consultation →</a></p>
+      person. Book your free in-clinic consultation at Lemon Street and a
+      <strong>${VOUCHER.amount} welcome voucher</strong> is yours to redeem against
+      your treatment plan.</p>
+      <p><a href="${BOOKING_URL}" style="color:#c97c4a;font-weight:bold">Book your free in-clinic consultation →</a></p>
+      <p style="font-size:13px">Can't get to Truro just yet?
+      <a href="${VIRTUAL_BOOKING_URL}" style="color:#6f8d8c">Book a free virtual video consultation instead</a>.</p>
       <p style="color:#757575">— ${CLINIC.name}, ${CLINIC.tagline}</p>
     </div>`;
 
-  const noteParts = ["📄 Endolift suitability report"];
+  const noteParts = ["📄 LaseMD Ultra skin analysis report"];
   if (label) noteParts.push(`— ${label}`);
   if (score !== undefined) noteParts.push(`(${score}/100)`);
   const noteBody = `${noteParts.join(" ")}: {url}`;

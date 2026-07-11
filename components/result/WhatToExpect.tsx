@@ -1,24 +1,24 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Zap, Hourglass, Leaf, BadgePoundSterling } from "lucide-react";
+import { Clock3, Sun, Sparkle, BadgePoundSterling } from "lucide-react";
 import { PRICE_GUIDE } from "@/lib/constants";
 
 const POINTS = [
   {
-    icon: Zap,
-    title: "Minimally invasive",
-    body: "A fine laser fibre works beneath the skin — no incisions, only local numbing.",
+    icon: Clock3,
+    title: "A 20-minute session",
+    body: "Numbing cream first, then a gentle, warm fractional pass across the skin — comfortable and quick.",
   },
   {
-    icon: Hourglass,
-    title: "Little downtime",
-    body: "Most people are back to normal within days; mild redness or swelling settles quickly.",
+    icon: Sun,
+    title: "Minimal downtime",
+    body: "Light redness and a fine, sandpaper feel settle within a few days — you're back to normal life the same day.",
   },
   {
-    icon: Leaf,
-    title: "Builds over months",
-    body: "Some lift is immediate, with collagen renewal continuing over roughly 3–6 months.",
+    icon: Sparkle,
+    title: "Glow that builds",
+    body: "Brightness shows from the first week, and collagen renewal keeps improving tone and texture over the following weeks.",
   },
 ];
 
@@ -44,7 +44,7 @@ export function WhatToExpect() {
       <p className="mt-4 flex items-center gap-2 text-sm text-body">
         <BadgePoundSterling size={16} className="text-sage-deep" />
         <span>
-          Endolift at MEDfacials from{" "}
+          LaseMD Ultra at MEDfacials from{" "}
           <span className="font-semibold text-heading">{PRICE_GUIDE.from}</span>.{" "}
           <span className="text-body/70">{PRICE_GUIDE.note}</span>
         </span>
