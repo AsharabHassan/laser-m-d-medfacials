@@ -15,7 +15,7 @@ import { VoucherCard } from "@/components/result/VoucherCard";
 import { PricingTeaser } from "@/components/result/PricingTeaser";
 import { StickyBookingBar } from "@/components/result/StickyBookingBar";
 import { DisclaimerBanner } from "@/components/compliance/DisclaimerBanner";
-import { BUCKET_META, LASERMD_CONCERNS } from "@/lib/constants";
+import { BUCKET_META, LASERMD_CONCERNS, VOUCHER } from "@/lib/constants";
 import { CONCERN_LABEL } from "@/lib/face-regions";
 import { EASE } from "@/lib/motion";
 
@@ -141,6 +141,22 @@ export function ResultScreen() {
       {/* ── 2 · Voucher + primary conversion (strike while emotion is high) */}
       <motion.div {...reveal(0.58)} className="mt-10">
         <VoucherCard />
+      </motion.div>
+      {/* Voucher terms — kept prominent, directly under the offer, so the
+          course-of-3 condition is clear before anyone books. */}
+      <motion.div {...reveal(0.6)} className="mt-3">
+        <p className="flex items-start gap-2 rounded-2xl border border-peach/40 bg-peach-light/30 px-4 py-3 text-[12.5px] leading-relaxed text-heading/85">
+          <Info size={15} className="mt-0.5 shrink-0 text-peach-deep" />
+          <span>
+            <span className="font-semibold text-heading">Voucher terms:</span>{" "}
+            your {VOUCHER.amount} welcome voucher is redeemable only when you
+            sign up for a{" "}
+            <span className="font-semibold text-heading">
+              course of 3 treatments
+            </span>
+            . One per new client, issued at your in-clinic consultation.
+          </span>
+        </p>
       </motion.div>
       <motion.div {...reveal(0.62)} className="mt-6">
         <DualBookingCTA label={meta.ctaLabel} />
