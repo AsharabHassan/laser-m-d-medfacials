@@ -86,8 +86,7 @@ export function ResultScreen() {
           {narrative.headline}
         </h2>
         <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-peach/50 bg-peach-light/40 px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-peach-deep">
-          <Gift size={13} /> £100 welcome voucher with your free in-clinic
-          consultation
+          <Gift size={13} /> £100 welcome voucher on a course of 3 treatments
         </span>
       </motion.div>
 

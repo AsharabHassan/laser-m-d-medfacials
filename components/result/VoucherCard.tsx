@@ -10,9 +10,10 @@ import { cn } from "@/lib/utils";
 /**
  * The hero conversion element — a premium gift-card panel promising the £100
  * welcome voucher for attending the free IN-CLINIC consultation in Truro.
- * The voucher is valid on ANY MEDfacials treatment, not just LaseMD Ultra —
- * that's the hook, so it gets its own pill. Pure promise: the voucher email
- * itself is sent by the GHL automation after booking.
+ * The voucher is redeemable only when the client signs up for a course of 3
+ * treatments — that condition gets its own pill and is repeated in the fine
+ * print. Pure promise: the voucher email itself is sent by the GHL automation
+ * after booking.
  */
 export function VoucherCard({ condensed = false }: { condensed?: boolean }) {
   const light = useLightFx();
@@ -25,8 +26,8 @@ export function VoucherCard({ condensed = false }: { condensed?: boolean }) {
           <span className="font-semibold text-heading">
             Your {VOUCHER.amount} welcome voucher
           </span>{" "}
-          — valid on any treatment — is still waiting. Book your free in-clinic
-          consultation to claim it.
+          — on a course of 3 treatments — is still waiting. Book your free
+          in-clinic consultation to claim it.
         </p>
       </div>
     );
@@ -69,7 +70,7 @@ export function VoucherCard({ condensed = false }: { condensed?: boolean }) {
             <Gift size={12} /> Welcome gift
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-heading px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-cream">
-            <Sparkles size={12} /> {VOUCHER.anyTreatment}
+            <Sparkles size={12} /> {VOUCHER.condition}
           </span>
         </div>
         <motion.p
@@ -101,7 +102,7 @@ export function VoucherCard({ condensed = false }: { condensed?: boolean }) {
           {CLINIC.name} · {CLINIC.addressLines[0]}, Truro — view on Google Maps
         </a>
         <p className="mt-1 text-[10.5px] text-body/70">
-          Redeemable in clinic against any treatment · one per new client
+          Redeemable in clinic on a course of 3 treatments · one per new client
         </p>
       </div>
     </motion.div>

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   title:
     "LaseMD Ultra from £149 · £100 welcome voucher · MEDfacials Truro",
   description:
-    "LaseMD Ultra laser skin rejuvenation at MEDfacials, Truro — sessions from £149, plus a £100 welcome voucher when you attend your free in-clinic consultation. Doctor-led, CQC registered.",
+    "LaseMD Ultra laser skin rejuvenation at MEDfacials, Truro — sessions from £149, plus a £100 welcome voucher when you start a course of 3 treatments at your free in-clinic consultation. Doctor-led, CQC registered.",
   // Ad retargeting landing page — keep it out of search results.
   robots: { index: false, follow: false },
 };
@@ -49,8 +49,8 @@ const TRUST_CARDS = [
   },
   {
     icon: Gift,
-    title: `${VOUCHER.amount} welcome voucher — any treatment`,
-    copy: "Attend your free in-clinic consultation and a £100 voucher is yours — valid on any treatment at MEDfacials, not just LaseMD Ultra.",
+    title: `${VOUCHER.amount} welcome voucher — course of 3`,
+    copy: "Attend your free in-clinic consultation and a £100 voucher is yours — redeemable when you sign up for a course of 3 treatments at MEDfacials.",
   },
 ] as const;
 
@@ -197,7 +197,7 @@ export default function OfferPage() {
             <p className="mx-auto mt-2 max-w-lg text-center text-sm text-body/80">
               At our Lemon Street clinic in Truro. Dr Stolte&apos;s team will
               assess your skin, build your personal plan — and your{" "}
-              {VOUCHER.amount} welcome voucher (valid on any treatment) is
+              {VOUCHER.amount} welcome voucher (on a course of 3 treatments) is
               yours for attending.
             </p>
             <p className="mt-2 text-center">

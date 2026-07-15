@@ -123,8 +123,8 @@ export const VOUCHER = {
   amount: "£100",
   title: "£100 Welcome Voucher",
   promise:
-    "Yours when you attend your free in-clinic consultation at our Truro clinic — and it's not just for LaseMD Ultra: spend it on any treatment at MEDfacials.",
-  anyTreatment: "Valid on any treatment",
+    "Yours when you attend your free in-clinic consultation at our Truro clinic and start a course of 3 LaseMD Ultra treatments.",
+  condition: "Redeemable on a course of 3 treatments",
   urgency: "Consultation places at our Truro clinic are limited each month.",
 } as const;
 
@@ -148,4 +148,4 @@ export const OFFER = {
 } as const;
 
 export const DISCLAIMER =
-  "This tool offers general information to help you prepare for a consultation. It is not a medical assessment or diagnosis. Suitability for LaseMD Ultra is confirmed in person by a qualified practitioner.";
+  "This tool offers general information to help you prepare for a consultation. It is not a medical assessment or diagnosis. Suitability for LaseMD Ultra is confirmed in person by a qualified practitioner. The £100 welcome voucher is redeemable only when you sign up for a course of 3 treatments; one per new client, issued at your in-clinic consultation.";

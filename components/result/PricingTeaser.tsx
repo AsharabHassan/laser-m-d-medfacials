@@ -22,8 +22,8 @@ export function PricingTeaser() {
       </p>
       <p className="mx-auto mt-3 max-w-md border-t border-sage/15 pt-3 text-[12.5px] leading-relaxed text-body/80">
         Your exact protocol is confirmed at your free in-clinic consultation in
-        Truro — where your £100 welcome voucher (valid on any treatment) is
-        waiting.
+        Truro — where your £100 welcome voucher (on a course of 3 treatments)
+        is waiting.
       </p>
     </div>
   );

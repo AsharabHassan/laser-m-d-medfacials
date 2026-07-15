@@ -49,7 +49,7 @@ export async function POST(request: Request): Promise<Response> {
       <p>It's a guide to help you prepare — your suitability is always confirmed in
       person. Book your free <strong>in-clinic consultation</strong> at our Truro
       clinic and a <strong>${VOUCHER.amount} welcome voucher</strong> is yours —
-      valid on <strong>any treatment</strong> at ${CLINIC.name}, not just LaseMD Ultra.</p>
+      redeemable when you sign up for a <strong>course of 3 treatments</strong> at ${CLINIC.name}.</p>
       <p><a href="${BOOKING_URL}" style="color:#c97c4a;font-weight:bold">Book your free in-clinic consultation →</a></p>
       <p style="font-size:13px">📍 Find us: ${CLINIC.name}, ${CLINIC.addressLines.join(", ")} —
       <a href="${CLINIC.mapsUrl}" style="color:#c97c4a">view on Google Maps</a>.</p>

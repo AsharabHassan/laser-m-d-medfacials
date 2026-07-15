@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Reveal your skin's natural brilliance · MEDfacials",
     description:
-      "A free 30-second AI skin analysis for LaseMD Ultra — personalised suitability report, plus a £100 welcome voucher when you book your free in-clinic consultation.",
+      "A free 30-second AI skin analysis for LaseMD Ultra — personalised suitability report, plus a £100 welcome voucher on a course of 3 treatments at your free in-clinic consultation.",
     url: SITE_URL,
     siteName: "MEDfacials",
     locale: "en_GB",

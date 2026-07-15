@@ -11,7 +11,7 @@ import {
 
 /**
  * The dual conversion CTA. PRIMARY: the free IN-CLINIC consultation at the
- * Truro clinic (which carries the £100 any-treatment voucher promise) — with
+ * Truro clinic (which carries the £100 voucher promise on a course of 3) — with
  * the address + Google Maps link right underneath so nobody wonders where to
  * go. SECONDARY, visually subordinate: a free online video consultation for
  * people who can't get to Truro yet. Both are plain GHL calendar links —
@@ -38,8 +38,8 @@ export function DualBookingCTA({
       </a>
 
       <span className="inline-flex items-center gap-1.5 rounded-full bg-peach-light/60 px-3.5 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-peach-deep">
-        <Gift size={13} /> Includes your {VOUCHER.amount} voucher · any
-        treatment
+        <Gift size={13} /> Includes your {VOUCHER.amount} voucher · course of
+        3
       </span>
 
       {!compact && (

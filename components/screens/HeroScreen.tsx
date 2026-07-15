@@ -39,7 +39,7 @@ export function HeroScreen() {
       >
         Take a 30-second AI skin scan and discover what LaseMD Ultra&trade;
         could do for your skin — with a personalised report, and a £100 welcome
-        voucher when you book your free in-clinic consultation.
+        voucher on a course of 3 treatments at your free in-clinic consultation.
       </motion.p>
 
       <motion.div
