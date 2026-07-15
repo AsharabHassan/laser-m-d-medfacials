@@ -94,6 +94,15 @@ describe("buildGhlPayload", () => {
     expect(p.submittedAt).toBe("2026-07-11T10:00:00.000Z");
   });
 
+  it("flattens arrays to comma-separated strings for GHL field mapping", () => {
+    const p = buildGhlPayload(lead, result, "t");
+    expect(p.concernsText).toBe("pigmentation, texture");
+    expect(p.observedAreasText).toBe("skin tone, texture");
+    expect(p.tagsText).toBe(
+      "lasermd-analyzer, lasermd-excellent, lasermd-voucher-eligible, lasermd-concern-pigmentation",
+    );
+  });
+
   it("records marketing consent as its own boolean, separate from the lead", () => {
     const granted = buildGhlPayload(lead, result, "t");
     expect(granted.marketingConsent).toBe(true);
