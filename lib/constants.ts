@@ -37,7 +37,7 @@ export const BOOKING_URL =
 
 export const VIRTUAL_BOOKING_URL =
   process.env.NEXT_PUBLIC_VIRTUAL_BOOKING_URL ??
-  "https://links.medfacials.com/widget/bookings/endolift-free-online-consultation";
+  "https://links.medfacials.com/widget/bookings/lase-free-online-consultation";
 
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://lasermd.medfacials.com";
