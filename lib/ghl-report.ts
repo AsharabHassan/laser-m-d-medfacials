@@ -82,10 +82,22 @@ export async function deliverReportToGhl(
 
     // 2 ── upsert the contact (deduped by email) → contactId, and write the report
     // URL into the custom field so downstream GHL automations read it as
-    // structured data. Field key is the bare GHL key (no "contact." prefix).
+    // structured data. Prefer referencing the field by its GHL id (the reliable
+    // way on the v2 upsert — GHL silently drops an unknown id/key without error);
+    // fall back to the field key. We log what GHL echoes back so a dropped write
+    // is visible instead of silently succeeding.
+    const fieldId = (process.env.GHL_REPORT_FIELD_ID || "").trim();
+    // NB: the GHL field key is spelled "lasemd" (no "r") — it must match the
+    // location's field exactly or GHL silently drops the write. Override with
+    // GHL_REPORT_FIELD_KEY / GHL_REPORT_FIELD_ID if the field ever changes.
     const fieldKey = (
-      process.env.GHL_REPORT_FIELD_KEY || "lasermd_report_pdf"
+      process.env.GHL_REPORT_FIELD_KEY || "lasemd_report_pdf"
     ).trim();
+    const customField = fieldId
+      ? { id: fieldId, field_value: fileUrl }
+      : fieldKey
+        ? { key: fieldKey, field_value: fileUrl }
+        : null;
     const upsertBody: Record<string, unknown> = {
       locationId: c.locationId,
       firstName: input.firstName,
@@ -93,8 +105,8 @@ export async function deliverReportToGhl(
       email: input.email,
       phone: input.phone,
     };
-    if (fieldKey) {
-      upsertBody.customFields = [{ key: fieldKey, field_value: fileUrl }];
+    if (customField) {
+      upsertBody.customFields = [customField];
     }
     const us = await fetch(`${BASE}/contacts/upsert`, {
       method: "POST",
@@ -102,9 +114,22 @@ export async function deliverReportToGhl(
       body: JSON.stringify(upsertBody),
     });
     const usj = (await us.json().catch(() => ({}))) as {
-      contact?: { id?: string };
+      contact?: { id?: string; customFields?: Array<{ id?: string }> };
     };
     const contactId = usj.contact?.id;
+    // Make a dropped custom-field write visible: GHL returns the contact's
+    // customFields by id, so when we write by id we can confirm it landed.
+    if (customField) {
+      const echoed = usj.contact?.customFields ?? [];
+      const landed = fieldId
+        ? echoed.some((f) => f.id === fieldId)
+        : "unknown (writing by key — set GHL_REPORT_FIELD_ID to verify)";
+      console.log(
+        `[api/report] report custom-field write: status=${us.status} ` +
+          `ref=${fieldId ? `id:${fieldId}` : `key:${fieldKey}`} ` +
+          `landed=${landed} fieldsReturned=${echoed.length}`,
+      );
+    }
     if (!contactId) {
       return { ok: false, fileUrl, error: `contact-upsert ${us.status}` };
     }
