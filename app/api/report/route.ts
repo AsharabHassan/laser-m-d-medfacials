@@ -73,6 +73,10 @@ export async function POST(request: Request): Promise<Response> {
     subject,
     emailHtml,
     noteBody,
+    // Send from the clinic's contact mailbox with a branded display name, instead
+    // of GHL's default reply@ sender. Requires contact@medfacials.com to be a
+    // verified sender in GHL.
+    emailFrom: `Med Facials <${CLINIC.email}>`,
   });
 
   // Surface failures in the server log without leaking the PDF.

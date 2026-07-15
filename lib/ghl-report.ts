@@ -29,6 +29,10 @@ export interface DeliverInput {
   subject: string;
   emailHtml: string;
   noteBody: string; // may contain "{url}" placeholder
+  /** Optional "From" for the outbound email, e.g. `Med Facials <contact@medfacials.com>`.
+   *  When omitted, GHL falls back to the location's default sending identity. The
+   *  address/domain must be a verified sender in GHL or the send will fail. */
+  emailFrom?: string;
 }
 
 export interface DeliverResult {
@@ -127,6 +131,7 @@ export async function deliverReportToGhl(
         body: JSON.stringify({
           type: "Email",
           contactId,
+          ...(input.emailFrom ? { emailFrom: input.emailFrom } : {}),
           subject: input.subject,
           html: input.emailHtml,
           attachments: [fileUrl],
